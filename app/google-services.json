@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "lost-and-found-android-app",
+    "project_number": "179957261506",
+    "name": "Lost and Found Android app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179957261506:android:69091f2817efd3ba",
+        "client_id": "android:edu.gatech.wguo64.lostandfoundandroidapp",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "edu.gatech.wguo64.lostandfoundandroidapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179957261506-mgvamtr1ij63be6asihnv4qs248563dv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.gatech.wguo64.lostandfoundandroidapp",
+            "certificate_hash": "E724D630E67A3B17D2BF695CA09F4BC450D437A4"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

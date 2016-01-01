@@ -1,0 +1,66 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:transitionName="actionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            android:layout_centerHorizontal="true"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp"
+            android:paddingTop="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/row_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/row_image"
+                    layout="@layout/row_detailiconview" />
+
+                <include
+                    android:id="@+id/row_description"
+                    layout="@layout/row_detailview" />
+
+                <include
+                    android:id="@+id/row_position_date"
+                    layout="@layout/row_detailview" />
+
+                <include
+                    android:id="@+id/row_get_it"
+                    layout="@layout/row_detailview" />
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:elevation="8dp"
+        app:fabSize="normal" />
+</android.support.design.widget.CoordinatorLayout>

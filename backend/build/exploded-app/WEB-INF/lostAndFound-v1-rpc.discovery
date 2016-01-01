@@ -1,0 +1,665 @@
+{
+ "kind": "discovery#rpcDescription",
+ "etag": "\"u_zXkMELIlX4ktyNbM2XKD4vK8E/vlGrQB99azsAGBTwq_DJLOq07p4\"",
+ "discoveryVersion": "v1",
+ "id": "lostAndFound:v1",
+ "name": "lostAndFound",
+ "version": "v1",
+ "description": "This is an API",
+ "ownerDomain": "api.lostandfound.cc.gatech.edu",
+ "ownerName": "api.lostandfound.cc.gatech.edu",
+ "icons": {
+  "x16": "http://www.google.com/images/icons/product/search-16.gif",
+  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+ },
+ "protocol": "rpc",
+ "rootUrl": "https://myApplicationId.appspot.com/_ah/api/",
+ "rpcUrl": "https://myApplicationId.appspot.com/_ah/api/rpc",
+ "rpcPath": "/_ah/api/rpc",
+ "parameters": {
+  "alt": {
+   "type": "string",
+   "description": "Data format for the response.",
+   "default": "json",
+   "enum": [
+    "json"
+   ],
+   "enumDescriptions": [
+    "Responses with Content-Type of application/json"
+   ],
+   "location": "query"
+  },
+  "fields": {
+   "type": "string",
+   "description": "Selector specifying which fields to include in a partial response.",
+   "location": "query"
+  },
+  "key": {
+   "type": "string",
+   "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+   "location": "query"
+  },
+  "oauth_token": {
+   "type": "string",
+   "description": "OAuth 2.0 token for the current user.",
+   "location": "query"
+  },
+  "prettyPrint": {
+   "type": "boolean",
+   "description": "Returns response with indentations and line breaks.",
+   "default": "true",
+   "location": "query"
+  },
+  "quotaUser": {
+   "type": "string",
+   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "location": "query"
+  },
+  "userIp": {
+   "type": "string",
+   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/userinfo.email": {
+     "description": "View your email address"
+    },
+    "https://www.googleapis.com/auth/userinfo.profile": {
+     "description": "View your basic profile info"
+    }
+   }
+  }
+ },
+ "schemas": {
+  "CollectionResponse_FoundReport": {
+   "id": "CollectionResponse_FoundReport",
+   "type": "object",
+   "properties": {
+    "items": {
+     "type": "array",
+     "items": {
+      "$ref": "FoundReport"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "CollectionResponse_LostReport": {
+   "id": "CollectionResponse_LostReport",
+   "type": "object",
+   "properties": {
+    "items": {
+     "type": "array",
+     "items": {
+      "$ref": "LostReport"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "FoundReport": {
+   "id": "FoundReport",
+   "type": "object",
+   "properties": {
+    "created": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "description": {
+     "type": "string"
+    },
+    "id": {
+     "type": "string",
+     "format": "int64"
+    },
+    "image": {
+     "type": "string",
+     "format": "byte"
+    },
+    "location": {
+     "$ref": "GeoPt"
+    },
+    "returned": {
+     "type": "boolean"
+    },
+    "timeFound": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "title": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    },
+    "userNickname": {
+     "type": "string"
+    }
+   }
+  },
+  "GeoPt": {
+   "id": "GeoPt",
+   "type": "object",
+   "properties": {
+    "latitude": {
+     "type": "number",
+     "format": "float"
+    },
+    "longitude": {
+     "type": "number",
+     "format": "float"
+    }
+   }
+  },
+  "LostReport": {
+   "id": "LostReport",
+   "type": "object",
+   "properties": {
+    "created": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "description": {
+     "type": "string"
+    },
+    "found": {
+     "type": "boolean"
+    },
+    "id": {
+     "type": "string",
+     "format": "int64"
+    },
+    "locations": {
+     "type": "array",
+     "items": {
+      "$ref": "GeoPt"
+     }
+    },
+    "timeLost": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "title": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    },
+    "userNickname": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "methods": {
+  "lostAndFound.foundReport.get": {
+   "id": "lostAndFound.foundReport.get",
+   "allowGet": true,
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "returns": {
+    "$ref": "FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.insert": {
+   "id": "lostAndFound.foundReport.insert",
+   "parameters": {
+    "resource": {
+     "$ref": "FoundReport"
+    }
+   },
+   "parameterOrder": [
+    "resource"
+   ],
+   "returns": {
+    "$ref": "FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.list": {
+   "id": "lostAndFound.foundReport.list",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    }
+   },
+   "returns": {
+    "$ref": "CollectionResponse_FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.myReports.list": {
+   "id": "lostAndFound.foundReport.myReports.list",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    }
+   },
+   "returns": {
+    "$ref": "CollectionResponse_FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.patch": {
+   "id": "lostAndFound.foundReport.patch",
+   "supportsPatch": true,
+   "parameters": {
+    "created": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "description": {
+     "type": "string"
+    },
+    "id": {
+     "type": "string",
+     "format": "int64"
+    },
+    "image": {
+     "type": "string",
+     "format": "byte"
+    },
+    "location": {
+     "$ref": "GeoPt"
+    },
+    "returned": {
+     "type": "boolean"
+    },
+    "timeFound": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "title": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    },
+    "userNickname": {
+     "type": "string"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "returns": {
+    "$ref": "FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.remove": {
+   "id": "lostAndFound.foundReport.remove",
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.search": {
+   "id": "lostAndFound.foundReport.search",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "q": {
+     "type": "string",
+     "required": true
+    }
+   },
+   "parameterOrder": [
+    "q"
+   ],
+   "returns": {
+    "$ref": "CollectionResponse_FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.test": {
+   "id": "lostAndFound.foundReport.test",
+   "allowGet": true,
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.foundReport.update": {
+   "id": "lostAndFound.foundReport.update",
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    },
+    "resource": {
+     "$ref": "FoundReport"
+    }
+   },
+   "parameterOrder": [
+    "resource",
+    "id"
+   ],
+   "returns": {
+    "$ref": "FoundReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.get": {
+   "id": "lostAndFound.lostReport.get",
+   "allowGet": true,
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "returns": {
+    "$ref": "LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.insert": {
+   "id": "lostAndFound.lostReport.insert",
+   "parameters": {
+    "resource": {
+     "$ref": "LostReport"
+    }
+   },
+   "parameterOrder": [
+    "resource"
+   ],
+   "returns": {
+    "$ref": "LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.list": {
+   "id": "lostAndFound.lostReport.list",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    }
+   },
+   "returns": {
+    "$ref": "CollectionResponse_LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.myReports.list": {
+   "id": "lostAndFound.lostReport.myReports.list",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    }
+   },
+   "returns": {
+    "$ref": "CollectionResponse_LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.patch": {
+   "id": "lostAndFound.lostReport.patch",
+   "supportsPatch": true,
+   "parameters": {
+    "created": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "description": {
+     "type": "string"
+    },
+    "found": {
+     "type": "boolean"
+    },
+    "id": {
+     "type": "string",
+     "format": "int64"
+    },
+    "locations": {
+     "type": "array",
+     "items": {
+      "$ref": "GeoPt"
+     }
+    },
+    "timeLost": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "title": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    },
+    "userNickname": {
+     "type": "string"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "returns": {
+    "$ref": "LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.remove": {
+   "id": "lostAndFound.lostReport.remove",
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.search": {
+   "id": "lostAndFound.lostReport.search",
+   "allowGet": true,
+   "parameters": {
+    "cursor": {
+     "type": "string"
+    },
+    "limit": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "q": {
+     "type": "string",
+     "required": true
+    }
+   },
+   "parameterOrder": [
+    "q"
+   ],
+   "returns": {
+    "$ref": "CollectionResponse_LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.test": {
+   "id": "lostAndFound.lostReport.test",
+   "allowGet": true,
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    }
+   },
+   "parameterOrder": [
+    "id"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.lostReport.update": {
+   "id": "lostAndFound.lostReport.update",
+   "parameters": {
+    "id": {
+     "type": "string",
+     "required": true,
+     "format": "int64"
+    },
+    "resource": {
+     "$ref": "LostReport"
+    }
+   },
+   "parameterOrder": [
+    "resource",
+    "id"
+   ],
+   "returns": {
+    "$ref": "LostReport"
+   },
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.notification.registerToken": {
+   "id": "lostAndFound.notification.registerToken",
+   "allowGet": true,
+   "parameters": {
+    "token": {
+     "type": "string",
+     "required": true
+    }
+   },
+   "parameterOrder": [
+    "token"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  },
+  "lostAndFound.reports.sendNotification": {
+   "id": "lostAndFound.reports.sendNotification",
+   "parameters": {
+    "message": {
+     "type": "string",
+     "required": true
+    }
+   },
+   "parameterOrder": [
+    "message"
+   ],
+   "scopes": [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+   ]
+  }
+ }
+}

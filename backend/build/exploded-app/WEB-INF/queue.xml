@@ -1,0 +1,11 @@
+<queue-entries>
+  <total-storage-limit>50M</total-storage-limit>
+	<queue>
+		<name>matchLostReport</name>
+		<rate>20/s</rate>
+	</queue>
+	<queue>
+		<name>matchFoundReport</name>
+		<rate>20/s</rate>
+	</queue>
+</queue-entries>
