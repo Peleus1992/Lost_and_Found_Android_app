@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +24,23 @@ import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseLostR
 import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
 import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.adapter.LostRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.MyPostRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.entity.MyPost;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
-public class MyPostFragment extends Fragment {
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar mProgressBar;
+public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRefreshListener {
+    public final static String TAG = MyPostFragment.class.getName();
+    public View rootView;
+    public SwipyRefreshLayout swipyRefreshLayout;
+    public RecyclerView recyclerView;
+    public ProgressBar progressBar;
 
-    private MyPostRecyclerViewAdapter rvAdapter;
-    private ArrayList<MyPost> myPosts = new ArrayList<MyPost>();
+    private MyPostRecyclerViewAdapter adapter;
+
+    private String cursor;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,55 +50,62 @@ public class MyPostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_my_posts, container, false);
+        View view = inflater.inflate(R.layout.fragment_lost, container, false);
 
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        inflateViews(view);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        setUIs();
 
-        rvAdapter = new MyPostRecyclerViewAdapter(new ArrayList<MyPost>(), this);
-        mRecyclerView.setAdapter(rvAdapter);
+        updateObjects();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new InitializeObjectsTask().execute();
-            }
-        });
-
-        new InitializeObjectsTask().execute();
-
-        mRecyclerView.setVisibility(View.GONE);
-        mProgressBar.setVisibility(View.VISIBLE);
         return view;
     }
-    public void updateObjects() {
-        new InitializeObjectsTask().execute();
-    }
-    public void setmProgressBar(boolean isVisible) {
-        if(isVisible) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mProgressBar.setVisibility(View.GONE);
+    @Override
+    public void onRefresh(SwipyRefreshLayoutDirection direction) {
+        if(direction == SwipyRefreshLayoutDirection.TOP) {
+            updateObjects();
+        } else if(direction == SwipyRefreshLayoutDirection.BOTTOM) {
+            appendObjects();
         }
     }
 
-    private class InitializeObjectsTask extends AsyncTask<Void, Void, Void> {
+    private void inflateViews(View view) {
+        rootView = view.findViewById(R.id.rootView);
+        swipyRefreshLayout = (SwipyRefreshLayout)view.findViewById(R.id.swipyRefreshLayout);
+        recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+    }
+
+    private void setUIs() {
+        swipyRefreshLayout.setOnRefreshListener(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new MyPostRecyclerViewAdapter(new
+                ArrayList<MyPost>(), getContext());
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void updateObjects() {
+        new InitializeObjectsTask().execute();
+    }
+
+    private void appendObjects() {
+//        new AppendObjectsTask().execute(cursor);
+    }
+
+    private class InitializeObjectsTask extends AsyncTask<Void, Void, ArrayList<MyPost>> {
 
         @Override
         protected void onPreExecute() {
-            rvAdapter.clearObjects();
             super.onPreExecute();
+            recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            adapter.clearObjects();
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            myPosts.clear();
-
+        protected ArrayList<MyPost> doInBackground(Void... params) {
+            ArrayList<MyPost> myPosts = new ArrayList<>();
             try {
                 CollectionResponseFoundReport foundReports = Api.getClient().foundReport().myReports().list()
                         .execute();
@@ -142,21 +157,20 @@ public class MyPostFragment extends Fragment {
                 Log.i("myinfo", e.getLocalizedMessage() + e.getMessage());
             }
 
-            return null;
+            return myPosts;
         }
 
         @Override
-        protected void onPostExecute(Void param) {
+        protected void onPostExecute(ArrayList<MyPost> myPosts) {
             //handle visibility
-            super.onPostExecute(param);
+            super.onPostExecute(myPosts);
 
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            swipyRefreshLayout.setRefreshing(false);
 
             //set data for list
-            rvAdapter.addObjects(myPosts);
-            mSwipeRefreshLayout.setRefreshing(false);
-
+            adapter.addObjects(myPosts);
         }
     }
 }

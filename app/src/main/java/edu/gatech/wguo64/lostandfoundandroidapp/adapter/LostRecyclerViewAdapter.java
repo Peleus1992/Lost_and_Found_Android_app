@@ -1,5 +1,6 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -24,13 +25,11 @@ import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
 public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerViewAdapter.ViewHolder> {
 
     private List<LostReport> reports;
-    private int rowLayout;
-    private LostFragment fragment;
+    private Context context;
 
-    public LostRecyclerViewAdapter(List<LostReport> reports, int rowLayout, LostFragment fragment) {
+    public LostRecyclerViewAdapter(List<LostReport> reports, Context context) {
         this.reports = reports;
-        this.rowLayout = rowLayout;
-        this.fragment = fragment;
+        this.context = context;
     }
 
 
@@ -40,19 +39,18 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
             for (int i = 0; i < size; i++) {
                 reports.remove(0);
             }
-
             this.notifyItemRangeRemoved(0, size);
         }
     }
 
     public void addObjects(List<LostReport> reports) {
         this.reports.addAll(reports);
-        this.notifyItemRangeInserted(0, reports.size());
+        this.notifyItemRangeInserted(getItemCount(), reports.size());
     }
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(rowLayout, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cardview_lost, viewGroup, false);
         return new ViewHolder(v);
     }
 
@@ -65,10 +63,9 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(fragment.getActivity(), DetailLostActivity.class);
-
+                intent.setClass(context, DetailLostActivity.class);
                 intent.putExtra("reportId", report.getId());
-                fragment.getActivity().startActivity(intent);
+                context.startActivity(intent);
             }
         });
         viewHolder.nickname.setText(report.getUserNickname());
@@ -80,7 +77,7 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
                         "mailto", report.getUserNickname() + "@gmail.com", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                fragment.getActivity().startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
             }
         });
         if(report.getFound()) {

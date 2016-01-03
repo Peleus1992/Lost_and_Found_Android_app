@@ -1,5 +1,7 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -30,11 +33,13 @@ import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
 public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecyclerViewAdapter.ViewHolder> {
 
     private List<MyPost> myPosts;
-    private MyPostFragment fragment;
+    private Context context;
 
-    public MyPostRecyclerViewAdapter(List<MyPost> myPosts, MyPostFragment fragment) {
+    public ProgressDialog progressDialog;
+
+    public MyPostRecyclerViewAdapter(List<MyPost> myPosts, Context context) {
         this.myPosts = myPosts;
-        this.fragment = fragment;
+        this.context = context;
     }
 
 
@@ -51,7 +56,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     public void addObjects(List<MyPost> myPosts) {
         this.myPosts.addAll(myPosts);
-        this.notifyItemRangeInserted(0, myPosts.size());
+        this.notifyItemRangeInserted(getItemCount(), myPosts.size());
     }
 
     @Override
@@ -67,12 +72,12 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         final MyPost myPost = myPosts.get(i);
 
         if(myPost.isFoundReport) {
-            viewHolder.reportTypeImg.setBackground(fragment.getActivity().getDrawable(R.drawable.ic_wb_incandescent_black_24dp));
+            viewHolder.reportTypeImg.setBackground(context.getDrawable(R.drawable.ic_wb_incandescent_black_24dp));
             viewHolder.statusBtn.setText("Returned");
             viewHolder.statusBtn.setChecked(myPost.status);
 
         } else {
-            viewHolder.reportTypeImg.setBackground(fragment.getActivity().getDrawable(R.drawable.ic_mood_bad_black_24dp));
+            viewHolder.reportTypeImg.setBackground(context.getDrawable(R.drawable.ic_mood_bad_black_24dp));
             viewHolder.statusBtn.setText("Found");
             viewHolder.statusBtn.setChecked(myPost.status);
         }
@@ -83,7 +88,10 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
-                        fragment.setmProgressBar(true);
+                        progressDialog = new ProgressDialog(context);
+                        progressDialog.setTitle(R.string.progress_dialog_title_update);
+                        progressDialog.setMessage(context.getString(R.string.progress_dialog_message_please_wait));
+                        progressDialog.show();
                     }
 
                     @Override
@@ -109,9 +117,9 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         super.onPostExecute(aVoid);
-//                        fragment.updateObjects();
-                        fragment.setmProgressBar(false);
+                        progressDialog.dismiss();
                     }
+
                 }.execute();
             }
         });
@@ -122,12 +130,12 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             public void onClick(View v) {
                 Intent intent = new Intent();
                 if(myPost.isFoundReport) {
-                    intent.setClass(fragment.getActivity(), DetailFoundActivity.class);
+                    intent.setClass(context, DetailFoundActivity.class);
                 } else {
-                    intent.setClass(fragment.getActivity(), DetailLostActivity.class);
+                    intent.setClass(context, DetailLostActivity.class);
                 }
                 intent.putExtra("reportId", myPost.id);
-                fragment.getActivity().startActivity(intent);
+                context.startActivity(intent);
             }
         });
         viewHolder.timestamp.setText(TimeManager.getTimeDifferential(myPost.created));
@@ -138,7 +146,10 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
-                        fragment.setmProgressBar(true);
+                        progressDialog = new ProgressDialog(context);
+                        progressDialog.setTitle(R.string.progress_dialog_title_update);
+                        progressDialog.setMessage(context.getString(R.string.progress_dialog_message_please_wait));
+                        progressDialog.show();
                     }
 
                     @Override
@@ -159,7 +170,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         super.onPostExecute(aVoid);
-                        fragment.updateObjects();
+                        progressDialog.dismiss();
                     }
                 }.execute();
             }

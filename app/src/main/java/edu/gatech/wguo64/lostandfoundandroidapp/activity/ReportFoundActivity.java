@@ -42,6 +42,8 @@ import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
  * Created by guoweidong on 10/25/15.
  */
 public class ReportFoundActivity extends AppCompatActivity {
+    public final static String TAG = ReportFoundActivity.class.getName();
+
     final static int REQUEST_OPEN_CAMERA_FOR_IMAGE = 100;
     final static int REQUEST_SELECT_PICTURE = 200;
     final static int REQUEST_POSITION = 300;
@@ -119,6 +121,7 @@ public class ReportFoundActivity extends AppCompatActivity {
                                     .execute();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Log.d(TAG, "doInBackgroud: " + e.getLocalizedMessage());
                         }
                         return null;
                     }

@@ -2,14 +2,19 @@ package edu.gatech.wguo64.lostandfoundandroidapp.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,14 +26,16 @@ import edu.gatech.wguo64.lostandfoundandroidapp.adapter.FoundRecyclerViewAdapter
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
-public class FoundFragment extends Fragment {
-    private RecyclerView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ProgressBar mProgressBar;
+public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefreshListener {
+    public final static String TAG = FoundFragment.class.getName();
+    public View rootView;
+    public SwipyRefreshLayout swipyRefreshLayout;
+    public RecyclerView recyclerView;
+    public ProgressBar progressBar;
 
-    private FoundRecyclerViewAdapter rvAdapter;
-    private ArrayList<FoundReport> reports = new
-            ArrayList<FoundReport>();
+    private FoundRecyclerViewAdapter adapter;
+
+    private String cursor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,92 +47,122 @@ public class FoundFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lost, container, false);
 
-        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        inflateViews(view);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        setUIs();
 
-        rvAdapter = new FoundRecyclerViewAdapter(new
-                ArrayList<FoundReport>(), R.layout.cardview_found,
-                this);
-        mRecyclerView.setAdapter(rvAdapter);
+        updateObjects();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id
-                .swipe_container);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R
-                .color.colorAccent));
-        mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout
-                .OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new InitializeObjectsTask().execute();
-            }
-        });
-
-        new InitializeObjectsTask().execute();
-
-        mRecyclerView.setVisibility(View.GONE);
-        mProgressBar.setVisibility(View.VISIBLE);
         return view;
     }
 
-    public void updateObjects() {
-        new InitializeObjectsTask().execute();
-    }
-    public void searchObjects(String keywords) {
-        new InitializeObjectsTask().execute(keywords);
-    }
-    public void setmProgressBar(boolean isVisible) {
-        if(isVisible) {
-            mProgressBar.setVisibility(View.VISIBLE);
-        } else {
-            mProgressBar.setVisibility(View.GONE);
+    @Override
+    public void onRefresh(SwipyRefreshLayoutDirection direction) {
+        if(direction == SwipyRefreshLayoutDirection.TOP) {
+            updateObjects();
+        } else if(direction == SwipyRefreshLayoutDirection.BOTTOM) {
+            appendObjects();
         }
     }
-    private class InitializeObjectsTask extends AsyncTask<String, Void, Void> {
+
+    private void inflateViews(View view) {
+        rootView = view.findViewById(R.id.rootView);
+        swipyRefreshLayout = (SwipyRefreshLayout)view.findViewById(R.id.swipyRefreshLayout);
+        recyclerView = (RecyclerView)view.findViewById(R.id.recyclerView);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+    }
+
+    private void setUIs() {
+        swipyRefreshLayout.setOnRefreshListener(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new FoundRecyclerViewAdapter(new
+                ArrayList<FoundReport>(), getContext());
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void updateObjects() {
+        new InitializeObjectsTask().execute();
+    }
+
+    private void appendObjects() {
+        new AppendObjectsTask().execute(cursor);
+    }
+
+    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseFoundReport> {
 
         @Override
         protected void onPreExecute() {
-            rvAdapter.clearObjects();
             super.onPreExecute();
+            recyclerView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+            adapter.clearObjects();
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            reports.clear();
-
+        protected CollectionResponseFoundReport doInBackground(Void... params) {
+            CollectionResponseFoundReport reports = null;
             try {
-                CollectionResponseFoundReport foundReports = null;
-                if(params.length == 0) {
-                    foundReports = Api.getClient().foundReport().list().execute();
-                } else {
-                    foundReports = Api.getClient().foundReport().search(params[0]).execute();
-                }
-                if (foundReports.getItems() != null) {
-                    for (FoundReport report : foundReports.getItems()) {
-                        reports.add(report);
-                    }
-                }
+                reports = Api.getClient().foundReport().list().execute();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "InitializeObjects: " + e.getLocalizedMessage());
             }
-            return null;
+            return reports;
         }
 
         @Override
-        protected void onPostExecute(Void param) {
+        protected void onPostExecute(CollectionResponseFoundReport reports) {
             //handle visibility
-            super.onPostExecute(param);
-
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
-
-            //set data for list
-            rvAdapter.addObjects(reports);
-            mSwipeRefreshLayout.setRefreshing(false);
-
-
+            super.onPostExecute(reports);
+            ArrayList<FoundReport> foundReports = new ArrayList<>();
+            if(reports != null) {
+                if(reports.getItems() != null) {
+                    foundReports.addAll(reports.getItems());
+                }
+                cursor = reports.getNextPageToken();
+                Log.i(TAG, "InitializeObjects: Cursor :" + cursor);
+            } else {
+                Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
+            }
+            recyclerView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            swipyRefreshLayout.setRefreshing(false);
+            adapter.addObjects(foundReports);
         }
     }
+
+    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseFoundReport> {
+
+        @Override
+        protected CollectionResponseFoundReport doInBackground(String... params) {
+            String cur = params[0];
+            CollectionResponseFoundReport reports = null;
+            try {
+                reports = Api.getClient().foundReport().list().setCursor(cur).execute();
+            } catch (Exception e) {
+                Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
+            }
+            return reports;
+        }
+
+        @Override
+        protected void onPostExecute(CollectionResponseFoundReport reports) {
+            //handle visibility
+            ArrayList<FoundReport> foundReports = new ArrayList<>();
+            if(reports != null) {
+                if(reports.getItems() != null) {
+                    foundReports.addAll(reports.getItems());
+                }
+                cursor = reports.getNextPageToken();
+            } else {
+                Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
+            }
+            swipyRefreshLayout.setRefreshing(false);
+            //set data for list
+            adapter.addObjects(foundReports);
+
+        }
+
+    }
+
 }

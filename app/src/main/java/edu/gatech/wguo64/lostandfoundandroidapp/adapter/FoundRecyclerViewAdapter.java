@@ -1,5 +1,6 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -25,13 +26,11 @@ import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
 public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecyclerViewAdapter.ViewHolder> {
 
     private List<FoundReport> reports;
-    private int rowLayout;
-    private FoundFragment fragment;
+    private Context context;
 
-    public FoundRecyclerViewAdapter(List<FoundReport> reports, int rowLayout, FoundFragment fragment) {
+    public FoundRecyclerViewAdapter(List<FoundReport> reports, Context context) {
         this.reports = reports;
-        this.rowLayout = rowLayout;
-        this.fragment = fragment;
+        this.context = context;
     }
 
 
@@ -47,27 +46,29 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
 
     public void addObjects(List<FoundReport> reports) {
         this.reports.addAll(reports);
-        this.notifyItemRangeInserted(0, reports.size());
+        this.notifyItemRangeInserted(getItemCount(), reports.size());
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(final ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(rowLayout, viewGroup, false);
+    public ViewHolder onCreateViewHolder(final ViewGroup viewGroup, int viewType) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cardview_found, viewGroup, false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int i) {
         final FoundReport report = reports.get(i);
-        viewHolder.objectImage.setBackground(report.getImage() != null ? ImageConvertor.stringToDrawable(report.getImage(), true) : fragment.getActivity().getDrawable(R.drawable.img_no_image_found));
+        viewHolder.objectImage.setBackground(report.getImage() != null ?
+                ImageConvertor.stringToDrawable(report.getImage(), true) :
+                context.getDrawable(R.drawable.img_no_image_found));
         viewHolder.title.setText(report.getTitle());
         viewHolder.title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(fragment.getActivity(), DetailFoundActivity.class);
+                intent.setClass(context, DetailFoundActivity.class);
                 intent.putExtra("reportId", report.getId());
-                fragment.getActivity().startActivity(intent);
+                context.startActivity(intent);
             }
         });
         viewHolder.nickname.setText(report.getUserNickname());
@@ -79,7 +80,7 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
                         "mailto", report.getUserNickname() + "@gmail.com", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                fragment.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
             }
         });
         if(report.getReturned()) {

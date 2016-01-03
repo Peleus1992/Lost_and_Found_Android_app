@@ -30,14 +30,16 @@ import com.google.android.gms.iid.InstanceID;
 import java.io.IOException;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
-import edu.gatech.wguo64.lostandfoundandroidapp.utility.Constants;
 
 public class RegistrationIntentService extends IntentService {
 
-    private static final String TAG = "RegIntentService";
+    private static final String TAG = RegistrationIntentService.class.getName();
     private static final String[] TOPICS = {"foundReportMatch",
             "lostReportMatch"};
+
+    private SharedPreferences preferences;
 
     public RegistrationIntentService() {
         super(TAG);
@@ -45,8 +47,7 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(this);
+        preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
 
         try {
             // [START register_for_gcm]
@@ -78,8 +79,8 @@ public class RegistrationIntentService extends IntentService {
             // sent to your server. If the boolean is false, send the token
             // to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(Constants
-                    .PREF_SENT_TOKEN_TO_SERVER, true).apply();
+            preferences.edit().putBoolean(Preferences
+                    .SENT_TOKEN_TO_SERVER, true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
@@ -87,13 +88,13 @@ public class RegistrationIntentService extends IntentService {
             // updating our registration data
             // on a third-party server, this ensures that we'll attempt the
             // update at a later time.
-            sharedPreferences.edit().putBoolean(Constants
-                    .PREF_SENT_TOKEN_TO_SERVER, false).apply();
+            preferences.edit().putBoolean(Preferences
+                    .SENT_TOKEN_TO_SERVER, false).apply();
         }
         // Notify UI that registration has completed, so the progress
         // indicator can be hidden.
-        Intent registrationComplete = new Intent(Constants
-                .PREF_REGISTRATION_COMPLETE);
+        Intent registrationComplete = new Intent(Preferences
+                .REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast
                 (registrationComplete);
     }
@@ -113,10 +114,10 @@ public class RegistrationIntentService extends IntentService {
             Api.getClient()
                     .notification().registerToken(token).execute();
         } catch (Exception e) {
-            Log.i("myinfo", e.getLocalizedMessage());
+            Log.d(TAG, "sendRegistrationToServer: " + e.getMessage());
             e.printStackTrace();
         }
-        getSharedPreferences("LostAndFound", 0).edit().putString("token",
+        preferences.edit().putString(Preferences.TOKEN,
                 token).apply();
     }
 
