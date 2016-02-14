@@ -7,6 +7,7 @@
             <param-name>services</param-name>
             <param-value>edu.gatech.wguo64.lostandfoundandroidapp.backend.FoundReportEndpoint,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.LostReportEndpoint,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.MyReportEndpoints,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.NotificationEndpoint</param-value>
         </init-param>
     </servlet>
@@ -14,7 +15,6 @@
         <servlet-name>SystemServiceServlet</servlet-name>
         <url-pattern>/_ah/spi/*</url-pattern>
     </servlet-mapping>
-
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>

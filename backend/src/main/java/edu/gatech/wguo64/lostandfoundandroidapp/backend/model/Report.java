@@ -22,7 +22,10 @@ public abstract class Report {
     Date created;
     @Index
     String userId;
-    String userNickname;
+    @Index
+    String userEmail;
+    String photoUrl;
+
 
     public Report() {
         created = new Date();
@@ -60,11 +63,20 @@ public abstract class Report {
         this.userId = userId;
     }
 
-    public String getUserNickname() {
-        return userNickname;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setUserNickname(String userNickname) {
-        this.userNickname = userNickname;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
 }

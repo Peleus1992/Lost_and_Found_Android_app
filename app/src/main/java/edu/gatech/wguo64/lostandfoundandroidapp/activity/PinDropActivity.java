@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.entity.Position;
 import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.DraggableCircle;

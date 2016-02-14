@@ -7,6 +7,5 @@
         android:layout_height="1dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginTop="12dp"
-        android:background="@color/dividers"/>
+        android:background="@android:color/darker_gray"/>
 </LinearLayout>

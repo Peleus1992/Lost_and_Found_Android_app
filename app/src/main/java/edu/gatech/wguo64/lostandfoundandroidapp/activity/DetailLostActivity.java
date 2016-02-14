@@ -7,60 +7,129 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.util.Calendar;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.GeoPt;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
+
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.GeoPt;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
-import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
 
-public class DetailLostActivity extends AppCompatActivity {
+public class DetailLostActivity extends AppCompatActivity implements View.OnClickListener {
+    public final static String TAG = DetailLostActivity.class.getName();
 
     public Toolbar toolbar;
 
-    public TextView title;
-    public TextView nickname;
-    public TextView timestamp;
-    public ImageView emailBtn;
-    public TextView found;
+    public ImageView userPhotoImg;
+    public TextView titleTxt;
+    public TextView timestampTxt;
+    public TextView descriptionTxt;
+    public TextView statusTxt;
+    public TextView datetimeTxt;
+    public MapFragment mapFragment;
+    public Button emailBtn;
+    public Button commentBtn;
+    public Button shareBtn;
 
-    public TextView description;
-    public TextView position;
-    public TextView timeLost;
+    GoogleMap googleMap;
+
+    LostReport report;
 
     public ProgressBar progressBar;
 
     public final static String TITLE = "Detailed Lost Report";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_lost);
-
-        initToolbar();
-
+        // Get LostReport
         Intent intent = getIntent();
-        long reportId = intent.getLongExtra("reportId", -1);
+        Long reportId = intent.getLongExtra("reportId", -1);
         if(reportId == -1) {
-            Log.i("myinfo", "no reportId");
+            Log.d(TAG, "no reportId");
             finish();
         }
-
-        initUI(reportId);
+        new ReportDownloader().execute(reportId);
+        inflateViews();
+        setUI();
     }
 
-    public void initToolbar() {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.emailBtn:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", (String)v.getTag(), null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                break;
+            case R.id.commentBtn:
+                break;
+            case R.id.shareBtn:
+                break;
+        }
+    }
+
+    class ReportDownloader extends AsyncTask<Long, Void, LostReport> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected LostReport doInBackground(Long... params) {
+            try {
+                return Api.getClient().lostReport().get(params[0]).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(LostReport lostReport) {
+            super.onPostExecute(lostReport);
+            report = lostReport;
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void inflateViews() {
+        userPhotoImg = (ImageView) findViewById(R.id.userPhotoImg);
+        titleTxt = (TextView) findViewById(R.id.titleTxt);
+        timestampTxt = (TextView) findViewById(R.id.timestampTxt);
+        descriptionTxt = (TextView) findViewById(R.id.descriptionTxt);
+        statusTxt = (TextView) findViewById(R.id.statusTxt);
+        datetimeTxt = (TextView) findViewById(R.id.datetimeTxt);
+        mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.map);
+        emailBtn = (Button) findViewById(R.id.emailBtn);
+        commentBtn = (Button) findViewById(R.id.commentBtn);
+        shareBtn = (Button) findViewById(R.id.shareBtn);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+    }
+
+    private void setUI() {
+        //Toolbar
         toolbar = (Toolbar)findViewById(R.id.toolBar);
         toolbar.setTitle(TITLE);
         setSupportActionBar(toolbar);
@@ -72,85 +141,66 @@ public class DetailLostActivity extends AppCompatActivity {
                 DetailLostActivity.this.onBackPressed();
             }
         });
+        //User photo
+        new ImageDownloader(userPhotoImg).execute(report.getPhotoUrl());
+        //Title
+        titleTxt.setText(report.getTitle());
+        //Timestamp
+        timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
+        //Description
+        descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        //Status
+        statusTxt.setText(report.getFound() ? "Found" : "Not Found");
+        statusTxt.setTextColor(report.getFound() ? Color.GREEN : Color.RED);
+        //Datetime
+        datetimeTxt.setText(TimeConvertor.getDateTime(report.getTimeLost().getValue()));
+        //Email button
+        emailBtn.setOnClickListener(this);
+        emailBtn.setTag(report.getUserEmail());
+        //Comment button
+        commentBtn.setOnClickListener(this);
+        //Share button
+        shareBtn.setOnClickListener(this);
+        //Position
+        googleMap = mapFragment.getMap();
+
+        // check if map is created successfully or not
+        if (googleMap == null) {
+            Toast.makeText(getApplicationContext(),
+                    "Sorry! unable to create maps", Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            googleMap.setMyLocationEnabled(true);
+            markLocation(report.getLocation());
+        }
+
+        progressBar.setVisibility(View.GONE);
     }
 
-    public void initUI(long reportId) {
+    private void markLocation(GeoPt geoPt) {
+        if(geoPt != null){
+            // Getting latitude of the current location
+            double latitude = geoPt.getLatitude();
 
-        title = (TextView) findViewById(R.id.title);
-        nickname = (TextView) findViewById(R.id.nickname);
-        timestamp = (TextView) findViewById(R.id.timestamp);
-        emailBtn = (ImageView) findViewById(R.id.emailBtn);
-        found = (TextView) findViewById(R.id.found);
-        description = (TextView) findViewById(R.id.description);
-        position = (TextView) findViewById(R.id.position);
-        timeLost = (TextView) findViewById(R.id.timeLost);
-        progressBar = (ProgressBar)findViewById(R.id.progressBar);
+            // Getting longitude of the current location
+            double longitude = geoPt.getLongitude();
 
-        new AsyncTask<Long, Void, LostReport>() {
+            // Creating a LatLng object for the current location
+            LatLng latLng = new LatLng(latitude, longitude);
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                progressBar.setVisibility(View.VISIBLE);
-            }
+            // Showing the current location in Google Map
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
-            @Override
-            protected LostReport doInBackground(Long... params) {
-                try {
-                    LostReport lostReport = Api.getClient()
-                            .lostReport().get(params[0]).execute();
-                    return lostReport;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
+            // Zoom in the Google Map
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-            @Override
-            protected void onPostExecute(final LostReport report) {
-                //handle visibility
-                super.onPostExecute(report);
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
+                    .title("Latitude: " + latitude + ", Longitude: " + longitude);
 
-                title.setText(report.getTitle());
-
-                nickname.setText(report.getUserNickname());
-                timestamp.setText(TimeManager.getTimeDifferential(report.getCreated().getValue()));
-                emailBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                                "mailto", report.getUserNickname() + "@gmail.com", null));
-                        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                        emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                    }
-                });
-                if(report.getFound()) {
-                    found.setText("Found");
-                    found.setTextColor(Color.GREEN);
-                } else {
-                    found.setText("Not Found");
-                    found.setTextColor(Color.RED);
-                }
-
-                description.setText(report.getDescription());
-                position.setText(Html.fromHtml("<b>Positions</b>"));
-                for (GeoPt geoPt : report.getLocations()) {
-                    position.append("\n" + LocationHelper.getAddress(DetailLostActivity.this, new LatLng(geoPt.getLatitude(), geoPt.getLongitude())));
-                }
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(report.getTimeLost().getValue());
-                timeLost.setText(Html.fromHtml("<b>Date and Time</b>"));
-                timeLost.append("\n" + calendar.get(Calendar.MONTH) + "/"
-                        + calendar.get(Calendar.DAY_OF_MONTH) + "/"
-                        + calendar.get(Calendar.YEAR) + " "
-                        + calendar.get(Calendar.HOUR_OF_DAY) + ":"
-                        + calendar.get(Calendar.MINUTE));
-
-                progressBar.setVisibility(View.GONE);
-
-            }
-        }.execute(reportId);
+            // adding marker
+            googleMap.addMarker(marker);
+        } else {
+            Log.d(TAG, "No such location");
+        }
     }
-
 }

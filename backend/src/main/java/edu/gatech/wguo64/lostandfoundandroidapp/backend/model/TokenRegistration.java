@@ -20,6 +20,10 @@ public class TokenRegistration {
     public TokenRegistration() {
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getToken() {
         return this.token;
     }

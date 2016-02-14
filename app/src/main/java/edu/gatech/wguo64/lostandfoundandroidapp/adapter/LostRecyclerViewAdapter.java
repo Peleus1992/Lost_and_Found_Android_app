@@ -8,21 +8,23 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.LostFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
 
 /**
  * Created by guoweidong on 10/24/15.
  */
-public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerViewAdapter.ViewHolder> {
+public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerViewAdapter.ViewHolder>
+    implements View.OnClickListener {
 
     private List<LostReport> reports;
     private Context context;
@@ -45,7 +47,7 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
 
     public void addObjects(List<LostReport> reports) {
         this.reports.addAll(reports);
-        this.notifyItemRangeInserted(getItemCount(), reports.size());
+        this.notifyItemRangeInserted(getItemCount() - reports.size(), reports.size());
     }
 
     @Override
@@ -57,36 +59,25 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int i) {
         final LostReport report = reports.get(i);
+        //User photo
+        new ImageDownloader(viewHolder.userPhotoImg).execute(report.getPhotoUrl());
+        //Title
+        viewHolder.titleTxt.setText(report.getTitle());
+        //Timestamp
+        viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
+        //Description
+        viewHolder.descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        //Status
+        viewHolder.statusTxt.setText(report.getFound() ? "Found" : "Not Found");
+        viewHolder.statusTxt.setTextColor(report.getFound() ? Color.GREEN : Color.RED);
+        //Email button
+        viewHolder.emailBtn.setOnClickListener(this);
+        viewHolder.emailBtn.setTag(report.getUserEmail());
+        //Comment button
+        viewHolder.commentBtn.setOnClickListener(this);
+        //Share button
+        viewHolder.shareBtn.setOnClickListener(this);
 
-        viewHolder.title.setText(report.getTitle());
-        viewHolder.title.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(context, DetailLostActivity.class);
-                intent.putExtra("reportId", report.getId());
-                context.startActivity(intent);
-            }
-        });
-        viewHolder.nickname.setText(report.getUserNickname());
-        viewHolder.timestamp.setText(TimeManager.getTimeDifferential(report.getCreated().getValue()));
-        viewHolder.emailBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", report.getUserNickname() + "@gmail.com", null));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
-            }
-        });
-        if(report.getFound()) {
-            viewHolder.found.setText("Found");
-            viewHolder.found.setTextColor(Color.GREEN);
-        } else {
-            viewHolder.found.setText("Not Found");
-            viewHolder.found.setTextColor(Color.RED);
-        }
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +86,23 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.emailBtn:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", (String)v.getTag(), null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                break;
+            case R.id.commentBtn:
+                break;
+            case R.id.shareBtn:
+                break;
+
+        }
+    }
 
     @Override
     public int getItemCount() {
@@ -103,20 +111,26 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView title;
-        public TextView nickname;
-        public TextView timestamp;
-        public ImageView emailBtn;
-        public TextView found;
 
+        public ImageView userPhotoImg;
+        public TextView titleTxt;
+        public TextView timestampTxt;
+        public TextView descriptionTxt;
+        public TextView statusTxt;
+        public Button emailBtn;
+        public Button commentBtn;
+        public Button shareBtn;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.title);
-            nickname = (TextView) itemView.findViewById(R.id.nickname);
-            timestamp = (TextView) itemView.findViewById(R.id.timestamp);
-            emailBtn = (ImageView) itemView.findViewById(R.id.emailBtn);
-            found = (TextView) itemView.findViewById(R.id.found);
+            userPhotoImg = (ImageView) itemView.findViewById(R.id.userPhotoImg);
+            titleTxt = (TextView) itemView.findViewById(R.id.titleTxt);
+            timestampTxt = (TextView) itemView.findViewById(R.id.timestampTxt);
+            descriptionTxt = (TextView) itemView.findViewById(R.id.descriptionTxt);
+            statusTxt = (TextView) itemView.findViewById(R.id.statusTxt);
+            emailBtn = (Button) itemView.findViewById(R.id.emailBtn);
+            commentBtn = (Button) itemView.findViewById(R.id.commentBtn);
+            shareBtn = (Button) itemView.findViewById(R.id.shareBtn);
         }
 
     }

@@ -1,19 +1,12 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -24,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -34,21 +26,13 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.wearable.internal.RemoveLargeAssetQueueEntriesResponse;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.ViewPagerAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.RequestCodes;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.FoundFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.LostFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.notification.RegistrationIntentService;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
 
 public class MainActivity extends AppCompatActivity implements NavigationView
         .OnNavigationItemSelectedListener, ViewPager.OnPageChangeListener, GoogleApiClient.OnConnectionFailedListener {
@@ -88,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView
         setNotificationClient();
 
         setUI();
+
     }
 
     @Override
@@ -207,28 +192,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView
         navigation.setNavigationItemSelectedListener(this);
         String userEmailAddress = preferences.getString(Preferences.ACCOUNT_NAME, null);
         emailaddress.setText(userEmailAddress);
-        new AsyncTask<String, Void, Drawable>() {
-            @Override
-            protected Drawable doInBackground(String... params) {
-
-                try {
-                    URL url = new URL(params[0]);
-                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                    connection.connect();
-                    Drawable drawable = BitmapDrawable.createFromStream(connection.getInputStream(), params[0]);
-                    return drawable;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Drawable drawable) {
-                super.onPostExecute(drawable);
-                userImage.setBackground(drawable);
-            }
-        }.execute(preferences.getString(Preferences
+        new ImageDownloader(userImage).execute(preferences.getString(Preferences
                 .ACCOUNT_PHOTO_URL, null));
 
         /**

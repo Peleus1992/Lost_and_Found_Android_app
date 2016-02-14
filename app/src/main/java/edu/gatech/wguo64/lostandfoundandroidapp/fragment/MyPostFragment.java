@@ -2,8 +2,8 @@ package edu.gatech.wguo64.lostandfoundandroidapp.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,16 +17,11 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseFoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseLostReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.adapter.LostRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.MyPostRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.entity.MyPost;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseMyReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
@@ -81,7 +76,7 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new MyPostRecyclerViewAdapter(new
-                ArrayList<MyPost>(), getContext());
+                ArrayList<MyReport>(), getContext());
         recyclerView.setAdapter(adapter);
     }
 
@@ -90,10 +85,10 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
     }
 
     private void appendObjects() {
-//        new AppendObjectsTask().execute(cursor);
+        new AppendObjectsTask().execute(cursor);
     }
 
-    private class InitializeObjectsTask extends AsyncTask<Void, Void, ArrayList<MyPost>> {
+    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseMyReport> {
 
         @Override
         protected void onPreExecute() {
@@ -104,73 +99,68 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         }
 
         @Override
-        protected ArrayList<MyPost> doInBackground(Void... params) {
-            ArrayList<MyPost> myPosts = new ArrayList<>();
+        protected CollectionResponseMyReport doInBackground(Void... params) {
+            CollectionResponseMyReport reports = null;
             try {
-                CollectionResponseFoundReport foundReports = Api.getClient().foundReport().myReports().list()
-                        .execute();
-                CollectionResponseLostReport lostReports = Api.getClient().lostReport().myReports().list()
-                        .execute();
-                List<FoundReport> foundReportList = foundReports.getItems() == null ? new ArrayList<FoundReport>() : foundReports.getItems();
-                List<LostReport> lostReportList = lostReports.getItems() == null ? new ArrayList<LostReport>() : lostReports.getItems();
-                int i = 0, j = 0;
-                while(i < foundReportList.size() && j < lostReportList.size()) {
-                    FoundReport foundReport = foundReportList.get(i);
-                    LostReport lostReport = lostReportList.get(j);
-
-                    if(foundReport.getCreated().getValue() >= lostReport.getCreated().getValue()) {
-                        myPosts.add(new MyPost(foundReport.getId(),
-                                                true,
-                                                foundReport.getTitle(),
-                                                foundReport.getCreated().getValue(),
-                                                foundReport.getReturned()));
-                        i++;
-                    } else {
-                        myPosts.add(new MyPost(lostReport.getId(),
-                                false,
-                                lostReport.getTitle(),
-                                lostReport.getCreated().getValue(),
-                                lostReport.getFound()));
-                        j++;
-                    }
-                }
-                while(i < foundReportList.size()) {
-                    FoundReport foundReport = foundReportList.get(i);
-                    myPosts.add(new MyPost(foundReport.getId(),
-                            true,
-                            foundReport.getTitle(),
-                            foundReport.getCreated().getValue(),
-                            foundReport.getReturned()));
-                    i++;
-                }
-                while(j < lostReportList.size()) {
-                    LostReport lostReport = lostReportList.get(j);
-                    myPosts.add(new MyPost(lostReport.getId(),
-                            false,
-                            lostReport.getTitle(),
-                            lostReport.getCreated().getValue(),
-                            lostReport.getFound()));
-                    j++;
-                }
+                reports = Api.getClient().myReport().list().execute();
             } catch (IOException e) {
-                e.printStackTrace();
-                Log.i("myinfo", e.getLocalizedMessage() + e.getMessage());
+                Log.d(TAG, "InitializeObjects: " + e.getLocalizedMessage());
             }
-
-            return myPosts;
+            return reports;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<MyPost> myPosts) {
+        protected void onPostExecute(CollectionResponseMyReport collectionResponseMyReport) {
             //handle visibility
-            super.onPostExecute(myPosts);
-
+            super.onPostExecute(collectionResponseMyReport);
+            ArrayList<MyReport> myReports = new ArrayList<>();
+            if(collectionResponseMyReport != null) {
+                if(collectionResponseMyReport.getItems() != null) {
+                    myReports.addAll(collectionResponseMyReport.getItems());
+                }
+                cursor = collectionResponseMyReport.getNextPageToken();
+            } else {
+                Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
+            }
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
             swipyRefreshLayout.setRefreshing(false);
-
-            //set data for list
-            adapter.addObjects(myPosts);
+            adapter.addObjects(myReports);
         }
     }
+
+    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseMyReport> {
+
+        @Override
+        protected CollectionResponseMyReport doInBackground(String... params) {
+            String cur = params[0];
+            CollectionResponseMyReport reports = null;
+            try {
+                reports = Api.getClient().myReport().list().setCursor(cur).execute();
+            } catch (Exception e) {
+                Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
+            }
+            return reports;
+        }
+
+        @Override
+        protected void onPostExecute(CollectionResponseMyReport collectionResponseMyReport) {
+            //handle visibility
+            ArrayList<MyReport> myReports = new ArrayList<>();
+            if(collectionResponseMyReport != null) {
+                if(collectionResponseMyReport.getItems() != null) {
+                    myReports.addAll(collectionResponseMyReport.getItems());
+                }
+                cursor = collectionResponseMyReport.getNextPageToken();
+            } else {
+                Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
+            }
+            swipyRefreshLayout.setRefreshing(false);
+            //set data for list
+            adapter.addObjects(myReports);
+
+        }
+
+    }
+
 }

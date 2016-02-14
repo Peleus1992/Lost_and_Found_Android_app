@@ -1,6 +1,5 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,10 +10,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.MyPostFragment;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 
 /**
  * Created by guoweidong on 10/24/15.

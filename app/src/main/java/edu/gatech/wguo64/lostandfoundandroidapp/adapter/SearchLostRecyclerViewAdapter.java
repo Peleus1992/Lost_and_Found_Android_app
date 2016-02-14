@@ -1,28 +1,18 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.List;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.entity.MyPost;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.MyPostFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
-import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
+
 
 /**
  * Created by guoweidong on 10/24/15.

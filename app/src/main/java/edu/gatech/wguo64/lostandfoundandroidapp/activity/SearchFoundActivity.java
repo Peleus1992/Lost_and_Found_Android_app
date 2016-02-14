@@ -21,14 +21,10 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 import java.util.ArrayList;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseFoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseLostReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchFoundRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchLostRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseFoundReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 
 public class SearchFoundActivity extends AppCompatActivity implements SwipyRefreshLayout.OnRefreshListener {
     public final static String TAG = SearchFoundActivity.class.getName();
@@ -144,7 +140,7 @@ public class SearchFoundActivity extends AppCompatActivity implements SwipyRefre
             String qry = params[0];
             CollectionResponseFoundReport reports = null;
             try {
-                reports = Api.getClient().foundReport().search(qry).execute();
+//                reports = Api.getClient().foundReport().search(qry).execute();
             } catch (Exception e) {
                 Log.d(TAG, "InitializeObjectsTask: " + e.getLocalizedMessage());
             }
@@ -181,7 +177,7 @@ public class SearchFoundActivity extends AppCompatActivity implements SwipyRefre
             String cur = params[1];
             CollectionResponseFoundReport reports = null;
             try {
-                reports = Api.getClient().foundReport().search(qry).setCursor(cur).execute();
+//                reports = Api.getClient().foundReport().search(qry).setCursor(cur).execute();
             } catch (Exception e) {
                 Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
             }

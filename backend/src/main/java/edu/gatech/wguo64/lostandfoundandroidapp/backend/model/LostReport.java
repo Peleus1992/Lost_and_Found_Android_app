@@ -4,19 +4,18 @@ package edu.gatech.wguo64.lostandfoundandroidapp.backend.model;
 import com.google.appengine.api.datastore.GeoPt;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Subclass;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by mkatri on 11/22/15.
  */
-
-@Entity
+@Subclass(index = true)
 public class LostReport extends Report {
     @Index
     Date timeLost;
-    List<GeoPt> locations;
+    GeoPt location;
     @Index
     boolean found;
 
@@ -33,12 +32,12 @@ public class LostReport extends Report {
         this.timeLost = timeLost;
     }
 
-    public List<GeoPt> getLocations() {
-        return locations;
+    public GeoPt getLocation() {
+        return location;
     }
 
-    public void setLocations(List<GeoPt> locations) {
-        this.locations = locations;
+    public void setLocation(GeoPt location) {
+        this.location = location;
     }
 
     public boolean getFound() {

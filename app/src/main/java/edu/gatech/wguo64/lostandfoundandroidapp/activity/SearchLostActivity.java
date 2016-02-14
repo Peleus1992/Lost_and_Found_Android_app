@@ -21,11 +21,10 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 import java.util.ArrayList;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseLostReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchLostRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseLostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
 
 public class SearchLostActivity extends AppCompatActivity implements SwipyRefreshLayout.OnRefreshListener {
     public final static String TAG = SearchLostActivity.class.getName();
@@ -141,7 +140,7 @@ public class SearchLostActivity extends AppCompatActivity implements SwipyRefres
             String qry = params[0];
             CollectionResponseLostReport reports = null;
             try {
-                reports = Api.getClient().lostReport().search(qry).execute();
+//                reports = Api.getClient().lostReport().search(qry).execute();
             } catch (Exception e) {
                 Log.d(TAG, "InitializeObjectsTask: " + e.getLocalizedMessage());
             }
@@ -178,7 +177,7 @@ public class SearchLostActivity extends AppCompatActivity implements SwipyRefres
             String cur = params[1];
             CollectionResponseLostReport reports = null;
             try {
-                reports = Api.getClient().lostReport().search(qry).setCursor(cur).execute();
+//                reports = Api.getClient().lostReport().search(qry).setCursor(cur).execute();
             } catch (Exception e) {
                 Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
             }

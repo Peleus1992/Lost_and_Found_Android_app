@@ -3,27 +3,35 @@ package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.List;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.fragment.FoundFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.time.TimeManager;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
 
 /**
  * Created by guoweidong on 10/24/15.
  */
-public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecyclerViewAdapter.ViewHolder> {
+public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecyclerViewAdapter.ViewHolder>
+    implements View.OnClickListener {
+    public static final String TAG = FoundRecyclerViewAdapter.class.getName();
 
     private List<FoundReport> reports;
     private Context context;
@@ -46,7 +54,7 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
 
     public void addObjects(List<FoundReport> reports) {
         this.reports.addAll(reports);
-        this.notifyItemRangeInserted(getItemCount(), reports.size());
+        this.notifyItemRangeInserted(getItemCount() - reports.size(), reports.size());
     }
 
     @Override
@@ -58,38 +66,59 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int i) {
         final FoundReport report = reports.get(i);
-        viewHolder.objectImage.setBackground(report.getImage() != null ?
-                ImageConvertor.stringToDrawable(report.getImage(), true) :
-                context.getDrawable(R.drawable.img_no_image_found));
-        viewHolder.title.setText(report.getTitle());
-        viewHolder.title.setOnClickListener(new View.OnClickListener() {
+
+        //User photo
+        new ImageDownloader(viewHolder.userPhotoImg).execute(report.getPhotoUrl());
+        //Title
+        viewHolder.titleTxt.setText(report.getTitle());
+        //Timestamp
+        viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
+        //Description
+        viewHolder.descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        //Object image
+//        viewHolder.objectImage.setImageDrawable(report.getImage() != null ?
+//                ImageConvertor.stringToDrawable(report.getImage(), true) :
+//                context.getDrawable(R.drawable.img_no_image_found));
+        new AsyncTask<Long, Void, Drawable>() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(context, DetailFoundActivity.class);
-                intent.putExtra("reportId", report.getId());
-                context.startActivity(intent);
+            protected void onPreExecute() {
+                super.onPreExecute();
+                viewHolder.objectImage.setVisibility(View.GONE);
             }
-        });
-        viewHolder.nickname.setText(report.getUserNickname());
-        viewHolder.timestamp.setText(TimeManager.getTimeDifferential(report.getCreated().getValue()));
-        viewHolder.emailBtn.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", report.getUserNickname() + "@gmail.com", null));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+            protected Drawable doInBackground(Long... params) {
+                try {
+                    FoundReport foundReport = Api.getClient().foundReport()
+                            .get(params[0]).execute();
+                    Log.i(TAG, "Image: " + foundReport.getPhotoUrl());
+                    Log.i(TAG, "Image: " + foundReport.getImage());
+                    String image = foundReport.getImage();
+                    return image == null ? null : ImageConvertor.stringToDrawable(image, false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
-        });
-        if(report.getReturned()) {
-            viewHolder.returned.setText("Returned");
-            viewHolder.returned.setTextColor(Color.GREEN);
-        } else {
-            viewHolder.returned.setText("Not Returned");
-            viewHolder.returned.setTextColor(Color.RED);
-        }
+
+            @Override
+            protected void onPostExecute(Drawable drawable) {
+                super.onPostExecute(drawable);
+                viewHolder.objectImage.setImageDrawable(drawable);
+                viewHolder.objectImage.setVisibility(View.VISIBLE);
+
+            }
+        }.execute(report.getId());
+        //Status
+        viewHolder.statusTxt.setText(report.getReturned() ? "Returned" : "Not Returned");
+        viewHolder.statusTxt.setTextColor(report.getReturned() ? Color.GREEN : Color.RED);
+        //Email button
+        viewHolder.emailBtn.setOnClickListener(this);
+        viewHolder.emailBtn.setTag(report.getUserEmail());
+        //Comment button
+        viewHolder.commentBtn.setOnClickListener(this);
+        //Share button
+        viewHolder.shareBtn.setOnClickListener(this);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,27 +129,51 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
     }
 
     @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.emailBtn:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto", (String)v.getTag(), null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
+                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
+                break;
+            case R.id.commentBtn:
+                break;
+            case R.id.shareBtn:
+                break;
+
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return reports == null ? 0 : reports.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        public ImageView userPhotoImg;
+        public TextView titleTxt;
+        public TextView timestampTxt;
+        public TextView descriptionTxt;
         public ImageView objectImage;
-        public TextView title;
-        public TextView nickname;
-        public TextView timestamp;
-        public ImageView emailBtn;
-        public TextView returned;
+        public TextView statusTxt;
+        public Button emailBtn;
+        public Button commentBtn;
+        public Button shareBtn;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            userPhotoImg = (ImageView) itemView.findViewById(R.id.userPhotoImg);
+            titleTxt = (TextView) itemView.findViewById(R.id.titleTxt);
+            timestampTxt = (TextView) itemView.findViewById(R.id.timestampTxt);
+            descriptionTxt = (TextView) itemView.findViewById(R.id.descriptionTxt);
             objectImage = (ImageView) itemView.findViewById(R.id.objectImage);
-            title = (TextView) itemView.findViewById(R.id.title);
-            nickname = (TextView) itemView.findViewById(R.id.nickname);
-            timestamp = (TextView) itemView.findViewById(R.id.timestamp);
-            emailBtn = (ImageView) itemView.findViewById(R.id.emailBtn);
-            returned = (TextView) itemView.findViewById(R.id.returned);
+            statusTxt = (TextView) itemView.findViewById(R.id.statusTxt);
+            emailBtn = (Button) itemView.findViewById(R.id.emailBtn);
+            commentBtn = (Button) itemView.findViewById(R.id.commentBtn);
+            shareBtn = (Button) itemView.findViewById(R.id.shareBtn);
         }
 
     }

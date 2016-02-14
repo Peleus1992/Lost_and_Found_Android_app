@@ -6,12 +6,13 @@ import com.google.android.gcm.server.Sender;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.TokenRegistration;
 
-import static com.googlecode.objectify.ObjectifyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
 
 /**
  * Created by mkatri on 12/4/15.
@@ -19,10 +20,13 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class NotificationHelper {
     private static final Logger logger = Logger.getLogger(NotificationEndpoint
             .class.getName());
+    static {
+        logger.setLevel(Level.INFO);
+    }
 
     public static void notify(Collection<String> userIds, String message) {
         if (message == null || message.trim().length() == 0) {
-            logger.warning("Not sending message because it is empty");
+            logger.info("Not sending message because it is empty");
             return;
         }
         // crop longer messages
@@ -30,7 +34,7 @@ public class NotificationHelper {
             message = message.substring(0, 1000) + "[...]";
         }
 
-        Sender sender = new Sender(Constants.GCM_API_KEY);
+        Sender sender = new Sender(Credentials.SERVER_KEY);
         for (String userId : userIds) {
             TokenRegistration record = ofy().load().type(TokenRegistration
                     .class).filter("userId", userId).first().now();
@@ -45,7 +49,7 @@ public class NotificationHelper {
                     String canonicalRegId = result.getCanonicalRegistrationId();
                     if (canonicalRegId != null) {
                         // if the regId changed, we have to update the datastore
-                        logger.info("Registration Id changed for " + record
+                        logger.warning("Registration Id changed for " + record
                                 .getToken() + " updating to " + canonicalRegId);
                         record.setToken(canonicalRegId);
                         ofy().save().entity(record).now();

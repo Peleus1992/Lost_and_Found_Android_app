@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,13 +18,10 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 import java.io.IOException;
 import java.util.ArrayList;
 
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseFoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.CollectionResponseLostReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.FoundReport;
-import edu.gatech.cc.lostandfound.api.lostAndFound.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.adapter.FoundRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.LostRecyclerViewAdapter;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseLostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
