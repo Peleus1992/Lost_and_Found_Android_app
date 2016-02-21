@@ -154,7 +154,7 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
         //Description
         descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
         //Object Image
-        objectImage.setImageDrawable(report.getImage() != null ? ImageConvertor.stringToDrawable(report.getImage(), false) : getDrawable(R.drawable.img_no_image_found));
+        new ImageDownloader(objectImage).execute(report.getImageURL());
         //Status
         statusTxt.setText(report.getReturned() ? "Returned" : "Not Returned");
         statusTxt.setTextColor(report.getReturned() ? Color.GREEN : Color.RED);

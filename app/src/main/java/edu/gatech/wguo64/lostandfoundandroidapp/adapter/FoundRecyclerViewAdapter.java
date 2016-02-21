@@ -79,36 +79,7 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
 //        viewHolder.objectImage.setImageDrawable(report.getImage() != null ?
 //                ImageConvertor.stringToDrawable(report.getImage(), true) :
 //                context.getDrawable(R.drawable.img_no_image_found));
-        new AsyncTask<Long, Void, Drawable>() {
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                viewHolder.objectImage.setVisibility(View.GONE);
-            }
-
-            @Override
-            protected Drawable doInBackground(Long... params) {
-                try {
-                    FoundReport foundReport = Api.getClient().foundReport()
-                            .get(params[0]).execute();
-                    Log.i(TAG, "Image: " + foundReport.getPhotoUrl());
-                    Log.i(TAG, "Image: " + foundReport.getImage());
-                    String image = foundReport.getImage();
-                    return image == null ? null : ImageConvertor.stringToDrawable(image, false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Drawable drawable) {
-                super.onPostExecute(drawable);
-                viewHolder.objectImage.setImageDrawable(drawable);
-                viewHolder.objectImage.setVisibility(View.VISIBLE);
-
-            }
-        }.execute(report.getId());
+        new ImageDownloader(viewHolder.objectImage).execute(report.getImageURL());
         //Status
         viewHolder.statusTxt.setText(report.getReturned() ? "Returned" : "Not Returned");
         viewHolder.statusTxt.setTextColor(report.getReturned() ? Color.GREEN : Color.RED);

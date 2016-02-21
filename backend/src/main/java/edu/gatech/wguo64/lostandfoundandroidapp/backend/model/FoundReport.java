@@ -1,5 +1,6 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.backend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.GeoPt;
 import com.googlecode.objectify.annotation.Entity;
@@ -17,8 +18,8 @@ public class FoundReport extends Report {
     @Index
     Date timeFound;
     GeoPt location;
-    Blob iconImage;
-    Blob image;
+    String imageURL;
+    String imageKey;
     @Index
     boolean returned;
 
@@ -27,20 +28,20 @@ public class FoundReport extends Report {
         returned = false;
     }
 
-    public Blob getIconImage() {
-        return iconImage;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setIconImage(Blob iconImage) {
-        this.iconImage = iconImage;
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
-    public Blob getImage() {
-        return image;
+    public String getImageKey() {
+        return imageKey;
     }
 
-    public void setImage(Blob image) {
-        this.image = image;
+    public void setImageKey(String imageKey) {
+        this.imageKey = imageKey;
     }
 
     public Date getTimeFound() {

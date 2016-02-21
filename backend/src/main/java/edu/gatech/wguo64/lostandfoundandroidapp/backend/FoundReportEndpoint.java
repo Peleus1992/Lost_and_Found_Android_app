@@ -6,6 +6,8 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
@@ -24,6 +26,7 @@ import javax.inject.Named;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Response;
 
 import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
 
@@ -74,8 +77,6 @@ public class FoundReportEndpoint {
             throw new NotFoundException("Could not find FoundReport with ID: " + id);
         }
         //Reduce file size
-        foundReport.setImage(null);
-        foundReport.setIconImage(null);
 
         return foundReport;
     }
@@ -99,6 +100,30 @@ public class FoundReportEndpoint {
             throw new NotFoundException("Could not find FoundReport with ID: " + id);
         }
         return foundReport;
+    }
+
+    /**
+     * Returns the {@link FoundReport} with the corresponding ID.
+     *
+     * @param user the google account user
+     * @return the url of image to be stored
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(
+            name = "foundReport.newImageURL",
+            path = "foundReport/newImageURL",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public Response newImageURL(User user) throws OAuthRequestException {
+        if(user == null) {
+            logger.exiting(FoundReportEndpoint.class.toString(), "Not logged in.");
+            throw new OAuthRequestException("You need to login to file reports.");
+        }
+        BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+        String url = blobstoreService.createUploadUrl("/uploadImage");
+        logger.info("Create new Image URL: " + url);
+        Response response = new Response();
+        response.setStringResponse(url);
+        return response;
     }
 
     /**
@@ -242,11 +267,12 @@ public class FoundReportEndpoint {
         QueryResultIterator<FoundReport> queryIterator = query.iterator();
         List<FoundReport> foundReportList = new ArrayList<FoundReport>();
         while (queryIterator.hasNext()) {
-            FoundReport foundReport = queryIterator.next();
-            foundReportList.add(foundReport);
+            foundReportList.add(queryIterator.next());
         }
         return CollectionResponse.<FoundReport>builder().setItems
                 (foundReportList).setNextPageToken(queryIterator.getCursor()
                 .toWebSafeString()).build();
     }
+
+
 }

@@ -5,6 +5,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.MyApi;
+import edu.gatech.wguo64.lostandfoundandroidapp.constants.Credentials;
 
 
 /**
@@ -17,7 +18,7 @@ public class Api {
         MyApi.Builder builder = new MyApi.Builder
                 (AndroidHttp.newCompatibleTransport(), new
                         AndroidJsonFactory(), credential)
-                .setRootUrl("https://lost-and-found-android-app.appspot.com/_ah/api/");
+                .setRootUrl(Credentials.APP_HOME + "/_ah/api/");
         builder.setApplicationName("Lost & Found Android App");
         myApi = builder.build();
     }

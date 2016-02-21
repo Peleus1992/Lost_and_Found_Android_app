@@ -9,5 +9,5 @@ public class Credentials {
     public static final String ANDROID_CLIENT_ID = "179957261506-mgvamtr1ij63be6asihnv4qs248563dv" +
             ".apps.googleusercontent.com";
     public static final String AUDIENCE = "server:client_id:" + WEB_CLIENT_ID;
-
+    public static final String APP_HOME = "https://lost-and-found-android-app.appspot.com";
 }

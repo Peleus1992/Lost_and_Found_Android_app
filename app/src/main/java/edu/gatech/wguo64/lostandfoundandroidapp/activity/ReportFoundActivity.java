@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.util.DateTime;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +49,8 @@ import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.RequestCodes;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
+import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageUploader;
+
 
 /**
  * Created by guoweidong on 10/25/15.
@@ -237,7 +240,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
 
     private void submitForm() {
 
-        FoundReport report = new FoundReport();
+        final FoundReport report = new FoundReport();
 
         report.setTitle(titleEdit.getText().toString());
 
@@ -249,24 +252,28 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
 
         report.setPhotoUrl(preferences.getString(Preferences.ACCOUNT_PHOTO_URL, null));
 
-        report.setImage(ImageConvertor.drawableToString(objectImage.getDrawable()));
-
         /**
          * Use network to post data on server.
          */
-        new AsyncTask<FoundReport, Void, Void>() {
+        new AsyncTask<Drawable, Void, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 progressBar.setVisibility(View.VISIBLE);
             }
             @Override
-            protected Void doInBackground(FoundReport...
+            protected Void doInBackground(Drawable...
                                                   params) {
                 try {
-                    Api.getClient().foundReport().insert(params[0])
+                    ImageUploader.ImageInfo imageInfo = ImageUploader.upload(params[0]);
+
+                    report.setImageKey(imageInfo.imageKey);
+                    report.setImageURL(imageInfo.imageURL);
+                    Api.getClient().foundReport().insert(report)
                             .execute();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return null;
@@ -278,7 +285,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
                 progressBar.setVisibility(View.GONE);
                 ReportFoundActivity.this.finish();
             }
-        }.execute(report);
+        }.execute(objectImage.getDrawable());
     }
 
     private Location getCurrentLocation() {
