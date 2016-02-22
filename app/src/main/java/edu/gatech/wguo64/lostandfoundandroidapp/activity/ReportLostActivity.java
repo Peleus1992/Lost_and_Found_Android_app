@@ -2,6 +2,7 @@ package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -23,6 +24,11 @@ import android.widget.ProgressBar;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,11 +44,12 @@ import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.GeoPt;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
+import edu.gatech.wguo64.lostandfoundandroidapp.constants.RequestCodes;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 /**
  * Created by guoweidong on 10/25/15.
  */
-public class ReportLostActivity extends AppCompatActivity implements GoogleMap.OnMarkerDragListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener {
+public class ReportLostActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener {
 //    final static int REQUEST_OPEN_CAMERA_FOR_IMAGE = 100;
 //    final static int REQUEST_SELECT_PICTURE = 200;
 //    final static int REQUEST_POSITION = 300;
@@ -64,6 +71,7 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
 
     Calendar datetime;
     GoogleMap googleMap;
+    Marker marker;
     GeoPt geoPt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,23 +85,15 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
     }
 
     @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        geoPt.setLongitude((float) marker.getPosition().longitude);
-        geoPt.setLatitude((float)marker.getPosition().latitude);
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
+    public void onMapLongClick(LatLng latLng) {
+        geoPt.setLatitude((float)latLng.latitude);
+        geoPt.setLongitude((float) latLng.longitude);
+        marker.setPosition(latLng);
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
+        marker.remove();
         markLocation(getCurrentLocation());
         return false;
     }
@@ -102,7 +102,21 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.changePosBtn:
+                try {
 
+                    startActivityForResult(new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .build(this), RequestCodes.CHANGE_POSITION);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                    Snackbar.make(ReportLostActivity.this.findViewById(R.id.coordinatorLayout)
+                            , "The google map service is not available now.", Snackbar.LENGTH_SHORT)
+                            .show();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                    Snackbar.make(ReportLostActivity.this.findViewById(R.id.coordinatorLayout)
+                            , "The google map service is not available now.", Snackbar.LENGTH_SHORT)
+                            .show();
+                }
                 break;
             case R.id.doneBtn:
                 if(!checkForm()) {
@@ -191,9 +205,12 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
                     "Sorry! unable to create maps", Toast.LENGTH_SHORT)
                     .show();
         } else {
-            googleMap.setMyLocationEnabled(true);
+            if(checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED
+                    || checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+            }
             googleMap.setOnMyLocationButtonClickListener(this);
-            googleMap.setOnMarkerDragListener(this);
+            googleMap.setOnMapLongClickListener(this);
             markLocation(getCurrentLocation());
         }
         //Change Position
@@ -212,9 +229,13 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
 
         report.setDescription(descriptionEdit.getText().toString());
 
-        report.setTimeLost(new DateTime(datetime.getTimeInMillis()));
+        if(!timeCheck.isChecked()) {
+            report.setTimeLost(new DateTime(datetime.getTimeInMillis()));
+        }
 
-        report.setLocation(geoPt);
+        if(!positionCheck.isChecked()) {
+            report.setLocation(geoPt);
+        }
 
         report.setPhotoUrl(preferences.getString(Preferences.ACCOUNT_PHOTO_URL, null));
 
@@ -271,9 +292,6 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
 
     private void markLocation(Location location) {
         if(location!=null){
-            geoPt = new GeoPt();
-            geoPt.setLongitude((float)location.getLongitude());
-            geoPt.setLatitude((float)location.getLatitude());
 
             Log.i(TAG, "Location Provider: " + location.getProvider());
 
@@ -286,17 +304,28 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
             // Creating a LatLng object for the current location
             LatLng latLng = new LatLng(latitude, longitude);
 
+            markLocation(latLng);
+
+        } else {
+            Log.d(TAG, "No such location");
+        }
+    }
+
+    private void markLocation(LatLng latLng) {
+        if(latLng != null){
+            geoPt = new GeoPt();
+            geoPt.setLongitude((float) latLng.longitude);
+            geoPt.setLatitude((float)latLng.latitude);
+
             // Showing the current location in Google Map
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
             // Zoom in the Google Map
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-            MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
-                    .title("Latitude: " + latitude + ", Longitude: " + longitude);
-
             // adding marker
-            googleMap.addMarker(marker);
+            marker = googleMap.addMarker(new MarkerOptions().position(latLng)
+                    .title("Latitude: " + latLng.latitude + ", Longitude: " + latLng.longitude));
 
         } else {
             Log.d(TAG, "No such location");
@@ -318,5 +347,24 @@ public class ReportLostActivity extends AppCompatActivity implements GoogleMap.O
             return false;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RequestCodes.CHANGE_POSITION) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Log.i(TAG, "Place: " + place.getName());
+                marker.remove();
+                markLocation(place.getLatLng());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.d(TAG, status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // Do nothing
+            }
+        }
     }
 }

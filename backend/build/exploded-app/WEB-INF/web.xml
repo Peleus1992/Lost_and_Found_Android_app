@@ -5,10 +5,10 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>edu.gatech.wguo64.lostandfoundandroidapp.backend.FoundReportEndpoint,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.LostReportEndpoint,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.MyReportEndpoints,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.NotificationEndpoint</param-value>
+            <param-value>edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.FoundReportEndpoint,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.LostReportEndpoint,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.MyReportEndpoints,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.NotificationEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

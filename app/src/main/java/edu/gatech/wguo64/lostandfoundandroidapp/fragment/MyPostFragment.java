@@ -76,11 +76,11 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new MyPostRecyclerViewAdapter(new
-                ArrayList<MyReport>(), getContext());
+                ArrayList<MyReport>(), getContext(), this);
         recyclerView.setAdapter(adapter);
     }
 
-    private void updateObjects() {
+    public void updateObjects() {
         new InitializeObjectsTask().execute();
     }
 

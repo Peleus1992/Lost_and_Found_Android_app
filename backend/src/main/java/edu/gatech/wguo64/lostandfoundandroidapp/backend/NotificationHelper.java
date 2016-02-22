@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.NotificationEndpoint;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.TokenRegistration;
 
 import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
@@ -24,7 +25,7 @@ public class NotificationHelper {
         logger.setLevel(Level.INFO);
     }
 
-    public static void notify(Collection<String> userIds, String message) {
+    public static void notify(Collection<String> userEmails, String message) {
         if (message == null || message.trim().length() == 0) {
             logger.info("Not sending message because it is empty");
             return;
@@ -35,9 +36,9 @@ public class NotificationHelper {
         }
 
         Sender sender = new Sender(Credentials.SERVER_KEY);
-        for (String userId : userIds) {
+        for (String userEmail : userEmails) {
             TokenRegistration record = ofy().load().type(TokenRegistration
-                    .class).filter("userId", userId).first().now();
+                    .class).filter("userEmail", userEmail).first().now();
 
             Message msg = new Message.Builder().addData("message", message)
                     .build();
@@ -72,7 +73,7 @@ public class NotificationHelper {
                     }
                 }
             } catch (IOException e) {
-                logger.warning("Error when sending message to : "+userId);
+                logger.warning("Error when sending message to : "+ userEmail);
             }
         }
     }

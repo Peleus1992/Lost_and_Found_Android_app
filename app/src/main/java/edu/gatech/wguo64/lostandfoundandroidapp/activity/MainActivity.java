@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView
                 logout();
                 break;
             case R.id.action_search:
-                startSelectSearchActivity();
+                startSearchReportActivity();
                 break;
         }
 
@@ -224,11 +224,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView
         startActivity(i);
     }
 
+
     private void startReportFoundActivity() {
         Intent i = new Intent(this, ReportFoundActivity.class);
         startActivity(i);
     }
 
+    private void startSearchReportActivity() {
+        Intent intent = new Intent(this, SearchReportActivity.class);
+        startActivity(intent);
+    }
     private void onItemSelected(int itemID) {
         switch (itemID) {
             case R.id.menu_item_lost:
@@ -248,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        if(status.isSuccess()) {
+                        if (status.isSuccess()) {
                             finish();
                         } else {
                             Log.e(TAG, getString(R.string.failure_log_out));
@@ -296,8 +301,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView
         }
     }
 
-    private void startSelectSearchActivity() {
-        Intent intent = new Intent(this, SelectSearchActivity.class);
-        startActivity(intent);
-    }
 }

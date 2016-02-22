@@ -21,7 +21,6 @@
                 android:id="@+id/userPhotoImg"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:src="@drawable/nav_pic_test"
                 android:layout_marginEnd="16dp"
                 android:scaleType="fitCenter"/>
             <LinearLayout
@@ -32,14 +31,12 @@
                     android:id="@+id/titleTxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@android:style/TextAppearance.Material.Title"
-                    android:text="I found a iphone 7"/>
+                    android:textAppearance="@android:style/TextAppearance.Material.Title" />
                 <TextView
                     android:id="@+id/timestampTxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@android:style/TextAppearance.Material.Caption"
-                    android:text="14 days ago"/>
+                    android:textAppearance="@android:style/TextAppearance.Material.Caption" />
             </LinearLayout>
         </LinearLayout>
 
@@ -55,8 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:singleLine="false"
-                android:textAppearance="@android:style/TextAppearance.Material.Body1"
-                android:text="Yestoday, I found a iphone 6 on the 2nd floor of Library, right behind the sofa. If any one who lost it, please contact me. Looking forward to returning it back."/>
+                android:textAppearance="@android:style/TextAppearance.Material.Body1" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,8 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@android:style/TextAppearance.Material.Caption"
-                android:textColor="@android:color/holo_red_dark"
-                android:text="Not Found"/>
+                android:textColor="@android:color/holo_red_dark" />
         </LinearLayout>
 
         <include

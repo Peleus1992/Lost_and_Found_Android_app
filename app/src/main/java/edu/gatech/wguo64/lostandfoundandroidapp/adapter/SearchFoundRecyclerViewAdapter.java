@@ -75,7 +75,7 @@ public class SearchFoundRecyclerViewAdapter extends RecyclerView.Adapter<SearchF
 
         public ViewHolder(View itemView) {
             super(itemView);
-            searchFlagImg = (ImageView)itemView.findViewById(R.id.searchFlagImg);
+//            searchFlagImg = (ImageView)itemView.findViewById(R.id.searchFlagImg);
             titleTxt = (TextView)itemView.findViewById(R.id.titleTxt);
         }
 

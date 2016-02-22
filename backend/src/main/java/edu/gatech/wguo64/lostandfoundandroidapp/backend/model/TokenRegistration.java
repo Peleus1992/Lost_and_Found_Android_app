@@ -14,7 +14,7 @@ public class TokenRegistration {
     Long id;
     String token;
     @Index
-    String userId;
+    String userEmail;
 
     //TODO support multiple tokens per user
     public TokenRegistration() {
@@ -32,11 +32,11 @@ public class TokenRegistration {
         this.token = token;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

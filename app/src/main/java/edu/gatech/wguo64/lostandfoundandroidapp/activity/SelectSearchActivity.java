@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 
+@Deprecated
 public class SelectSearchActivity extends AppCompatActivity implements View.OnClickListener{
     public Button lostSearchBtn, foundSearchBtn;
     @Override
@@ -41,13 +42,13 @@ public class SelectSearchActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void startLostSearchActivity() {
-        Intent intent = new Intent(this, SearchLostActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, SearchLostActivity.class);
+//        startActivity(intent);
     }
 
     private void startFoundSearchActivity() {
-        Intent intent = new Intent(this, SearchFoundActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, SearchReportActivity.class);
+//        startActivity(intent);
     }
 
 }

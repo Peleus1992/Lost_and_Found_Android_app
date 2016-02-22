@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
@@ -71,6 +73,14 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
         new ImageDownloader(viewHolder.userPhotoImg).execute(report.getPhotoUrl());
         //Title
         viewHolder.titleTxt.setText(report.getTitle());
+        viewHolder.titleTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, DetailFoundActivity.class);
+                intent.putExtra("reportId", report.getId());
+                context.startActivity(intent);
+            }
+        });
         //Timestamp
         viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description

@@ -1,6 +1,7 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -67,9 +68,9 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
             Log.d(TAG, "no reportId");
             finish();
         }
-        new ReportDownloader().execute(reportId);
+
         inflateViews();
-        setUI();
+        new ReportDownloader().execute(reportId);
     }
 
     @Override
@@ -109,8 +110,12 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
         @Override
         protected void onPostExecute(LostReport lostReport) {
             super.onPostExecute(lostReport);
+            if(lostReport == null) {
+                finish();
+            }
             report = lostReport;
-            progressBar.setVisibility(View.VISIBLE);
+            setUI();
+            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -148,12 +153,13 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
         //Timestamp
         timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description
-        descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        descriptionTxt.setText(report.getDescription());
         //Status
         statusTxt.setText(report.getFound() ? "Found" : "Not Found");
         statusTxt.setTextColor(report.getFound() ? Color.GREEN : Color.RED);
         //Datetime
-        datetimeTxt.setText(TimeConvertor.getDateTime(report.getTimeLost().getValue()));
+        datetimeTxt.setText(report.getTimeLost() == null ? "I could not remember."
+                : TimeConvertor.getDateTime(report.getTimeLost().getValue()));
         //Email button
         emailBtn.setOnClickListener(this);
         emailBtn.setTag(report.getUserEmail());
@@ -170,7 +176,10 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
                     "Sorry! unable to create maps", Toast.LENGTH_SHORT)
                     .show();
         } else {
-            googleMap.setMyLocationEnabled(true);
+            if(checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED
+                    || checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+            }
             markLocation(report.getLocation());
         }
 

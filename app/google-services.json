@@ -22,6 +22,10 @@
             "package_name": "edu.gatech.wguo64.lostandfoundandroidapp",
             "certificate_hash": "E724D630E67A3B17D2BF695CA09F4BC450D437A4"
           }
+        },
+        {
+          "client_id": "179957261506-0v5m4i2bg8v9bj34ln03qs9b38gs93mo.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],

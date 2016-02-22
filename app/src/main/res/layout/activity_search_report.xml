@@ -1,48 +1,45 @@
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:layout_height="wrap_content"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <FrameLayout
-        android:layout_width="match_parent" android:layout_height="match_parent">
-        <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-            android:id="@+id/swipyRefreshLayout"
+    </android.support.design.widget.AppBarLayout>
+
+    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:id="@+id/swipyRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:direction="bottom"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:direction="bottom">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="80dp"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_horizontal_margin" />
-        </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="72dp"
-            android:visibility="gone"/>
-    </FrameLayout>
+            android:clipToPadding="false" />
+    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="72dp"
+        android:visibility="gone"/>
 
+</android.support.design.widget.CoordinatorLayout>

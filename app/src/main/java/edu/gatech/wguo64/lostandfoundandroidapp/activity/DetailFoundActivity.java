@@ -1,6 +1,7 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -69,10 +70,9 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
             Log.d(TAG, "no reportId");
             finish();
         }
-        new ReportDownloader().execute(reportId);
-        inflateViews();
-        setUI();
 
+        inflateViews();
+        new ReportDownloader().execute(reportId);
     }
 
     @Override
@@ -112,8 +112,12 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected void onPostExecute(FoundReport foundReport) {
             super.onPostExecute(foundReport);
+            if(foundReport == null) {
+                finish();
+            }
             report = foundReport;
-            progressBar.setVisibility(View.VISIBLE);
+            setUI();
+            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -159,7 +163,8 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
         statusTxt.setText(report.getReturned() ? "Returned" : "Not Returned");
         statusTxt.setTextColor(report.getReturned() ? Color.GREEN : Color.RED);
         //Datetime
-        datetimeTxt.setText(TimeConvertor.getDateTime(report.getTimeFound().getValue()));
+        datetimeTxt.setText(report.getTimeFound() == null ? "I could not remember."
+                : TimeConvertor.getDateTime(report.getTimeFound().getValue()));
         //Email button
         emailBtn.setOnClickListener(this);
         emailBtn.setTag(report.getUserEmail());
@@ -176,7 +181,10 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
                     "Sorry! unable to create maps", Toast.LENGTH_SHORT)
                     .show();
         } else {
-            googleMap.setMyLocationEnabled(true);
+            if(checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED
+                    || checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+            }
             markLocation(report.getLocation());
         }
 

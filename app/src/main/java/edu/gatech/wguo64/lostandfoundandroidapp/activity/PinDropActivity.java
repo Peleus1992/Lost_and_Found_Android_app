@@ -41,7 +41,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.entity.Position;
 import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.DraggableCircle;
 import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 
-
+@Deprecated
 public class PinDropActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerDragListener, GoogleMap.OnInfoWindowClickListener
 {

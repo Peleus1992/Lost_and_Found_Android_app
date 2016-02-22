@@ -24,6 +24,7 @@ import java.util.List;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
+import edu.gatech.wguo64.lostandfoundandroidapp.fragment.MyPostFragment;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
@@ -38,12 +39,14 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     private List<MyReport> myReports;
     private Context context;
+    private MyPostFragment fragment;
 
     public ProgressDialog progressDialog;
 
-    public MyPostRecyclerViewAdapter(List<MyReport> myReports, Context context) {
+    public MyPostRecyclerViewAdapter(List<MyReport> myReports, Context context, MyPostFragment fragment) {
         this.myReports = myReports;
         this.context = context;
+        this.fragment = fragment;
     }
 
     public void clearObjects() {
@@ -93,8 +96,15 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         //Share button
         viewHolder.shareBtn.setOnClickListener(this);
         //Status button
-        viewHolder.statusBtn.setOnClickListener(this);
-        viewHolder.statusBtn.setTag(report.getId());
+        if(myReport.getStatus()) {
+            viewHolder.statusBtn.setVisibility(View.GONE);
+        } else {
+            viewHolder.statusBtn.setVisibility(View.VISIBLE);
+            viewHolder.statusBtn.setText(myReport.getIsLostReport() ? "I have found it" : "I have returned it");
+            viewHolder.statusBtn.setOnClickListener(this);
+            viewHolder.statusBtn.setTag(report.getId());
+        }
+
         //Delete button
         viewHolder.deleteBtn.setOnClickListener(this);
         viewHolder.deleteBtn.setTag(report.getId());
@@ -122,10 +132,14 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             case R.id.shareBtn:
                 break;
             case R.id.statusBtn:
-                updateStatus((Long)v.getTag());
+                if(v.getTag() != null && v.getTag() instanceof Long) {
+                    updateStatus((Long) v.getTag());
+                }
                 break;
             case R.id.deleteBtn:
-
+                if(v.getTag() != null && v.getTag() instanceof Long) {
+                    deleteMyReport((Long)v.getTag());
+                }
                 break;
 
         }
@@ -160,8 +174,8 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             emailBtn = (Button) itemView.findViewById(R.id.emailBtn);
             commentBtn = (Button) itemView.findViewById(R.id.commentBtn);
             shareBtn = (Button) itemView.findViewById(R.id.shareBtn);
-            statusBtn = (Button) itemView.findViewById(R.id.commentBtn);
-            deleteBtn = (Button) itemView.findViewById(R.id.shareBtn);
+            statusBtn = (Button) itemView.findViewById(R.id.statusBtn);
+            deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
         }
 
     }
@@ -207,6 +221,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                         } else {
                             Toast.makeText(context, "Update status success.", Toast.LENGTH_SHORT).show();
                         }
+                        fragment.updateObjects();
                     }
                 }.execute(id);
             }
@@ -256,9 +271,9 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
                     @Override
                     protected void onPostExecute(Void v) {
-
                         super.onPostExecute(v);
                         progressDialog.dismiss();
+                        fragment.updateObjects();
                     }
                 }.execute(id);
             }

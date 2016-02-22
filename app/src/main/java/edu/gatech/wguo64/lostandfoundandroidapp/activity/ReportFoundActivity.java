@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputConnection;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -27,6 +28,11 @@ import android.widget.ProgressBar;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -55,7 +61,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageUploader;
 /**
  * Created by guoweidong on 10/25/15.
  */
-public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.OnMarkerDragListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener {
+public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.OnMapLongClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener {
 
     public final static String TAG = ReportFoundActivity.class.getName();
 
@@ -78,6 +84,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
 
     Calendar datetime;
     GoogleMap googleMap;
+    Marker marker;
     GeoPt geoPt;
     String imageName;
 
@@ -93,23 +100,15 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
     }
 
     @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        geoPt.setLongitude((float) marker.getPosition().longitude);
-        geoPt.setLatitude((float)marker.getPosition().latitude);
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
+    public void onMapLongClick(LatLng latLng) {
+        geoPt.setLatitude((float)latLng.latitude);
+        geoPt.setLongitude((float) latLng.longitude);
+        marker.setPosition(latLng);
     }
 
     @Override
     public boolean onMyLocationButtonClick() {
+        marker.remove();
         markLocation(getCurrentLocation());
         return false;
     }
@@ -129,11 +128,25 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
                         "Picture"), RequestCodes.SELECT_PICTURE);
                 break;
             case R.id.changePosBtn:
+                try {
 
+                    startActivityForResult(new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .build(this), RequestCodes.CHANGE_POSITION);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                    Snackbar.make(ReportFoundActivity.this.findViewById(R.id.coordinatorLayout)
+                            , "The google map service is not available now.", Snackbar.LENGTH_SHORT)
+                            .show();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                    Snackbar.make(ReportFoundActivity.this.findViewById(R.id.coordinatorLayout)
+                            , "The google map service is not available now.", Snackbar.LENGTH_SHORT)
+                            .show();
+                }
                 break;
             case R.id.doneBtn:
                 if(!checkForm()) {
-                    Snackbar.make(ReportFoundActivity.this.findViewById(R.id.coordinatorLayout), "Please fill the blank above", Snackbar.LENGTH_LONG)
+                    Snackbar.make(ReportFoundActivity.this.findViewById(R.id.coordinatorLayout), "Please fill the blank above", Snackbar.LENGTH_SHORT)
                             .show();
                     return;
                 }
@@ -225,9 +238,12 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
                     "Sorry! unable to create maps", Toast.LENGTH_SHORT)
                     .show();
         } else {
-            googleMap.setMyLocationEnabled(true);
+            if(checkCallingOrSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED
+                    || checkCallingOrSelfPermission("android.permission.ACCESS_FINE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+            }
             googleMap.setOnMyLocationButtonClickListener(this);
-            googleMap.setOnMarkerDragListener(this);
+            googleMap.setOnMapLongClickListener(this);
             markLocation(getCurrentLocation());
         }
 
@@ -246,9 +262,13 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
 
         report.setDescription(descriptionEdit.getText().toString());
 
-        report.setTimeFound(new DateTime(datetime.getTimeInMillis()));
+        if(!timeCheck.isChecked()) {
+            report.setTimeFound(new DateTime(datetime.getTimeInMillis()));
+        }
 
-        report.setLocation(geoPt);
+        if(!positionCheck.isChecked()) {
+            report.setLocation(geoPt);
+        }
 
         report.setPhotoUrl(preferences.getString(Preferences.ACCOUNT_PHOTO_URL, null));
 
@@ -310,9 +330,6 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
 
     private void markLocation(Location location) {
         if(location!=null){
-            geoPt = new GeoPt();
-            geoPt.setLongitude((float)location.getLongitude());
-            geoPt.setLatitude((float)location.getLatitude());
 
             Log.i(TAG, "Location Provider: " + location.getProvider());
 
@@ -325,17 +342,28 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
             // Creating a LatLng object for the current location
             LatLng latLng = new LatLng(latitude, longitude);
 
+            markLocation(latLng);
+
+        } else {
+            Log.d(TAG, "No such location");
+        }
+    }
+
+    private void markLocation(LatLng latLng) {
+        if(latLng != null){
+            geoPt = new GeoPt();
+            geoPt.setLongitude((float) latLng.longitude);
+            geoPt.setLatitude((float)latLng.latitude);
+
             // Showing the current location in Google Map
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
             // Zoom in the Google Map
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-            MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
-                    .title("Latitude: " + latitude + ", Longitude: " + longitude);
-
             // adding marker
-            googleMap.addMarker(marker);
+            marker = googleMap.addMarker(new MarkerOptions().position(latLng)
+                    .title("Latitude: " + latLng.latitude + ", Longitude: " + latLng.longitude));
 
         } else {
             Log.d(TAG, "No such location");
@@ -390,8 +418,16 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
             }
         } else if (requestCode == RequestCodes.CHANGE_POSITION) {
             if (resultCode == RESULT_OK) {
-                //Todo
-
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Log.i(TAG, "Place: " + place.getName());
+                marker.remove();
+                markLocation(place.getLatLng());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.d(TAG, status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // Do nothing
             }
         }
     }

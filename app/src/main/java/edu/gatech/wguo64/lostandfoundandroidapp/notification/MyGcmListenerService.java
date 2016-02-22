@@ -83,12 +83,12 @@ public class MyGcmListenerService extends GcmListenerService {
         long reportId = -1;
         if(message.startsWith("Lost")) {
             intent = new Intent(this, DetailLostActivity.class);
-            reportId = Long.parseLong(message.substring(4));
+            reportId = Long.parseLong(message.substring(5));
             intent.putExtra("reportId", reportId);
             message = "Your found report may get a match!";
         } else if(message.startsWith("Found")){
             intent = new Intent(this, DetailFoundActivity.class);
-            reportId = Long.parseLong(message.substring(5));
+            reportId = Long.parseLong(message.substring(6));
             intent.putExtra("reportId", reportId);
             message = "Your lost report may get a match!";
         }
