@@ -4,3 +4,22 @@ Georgia Tech students move around school with many objects: cell-phones, noteboo
 This is originally a project for class CS6235 which I worked with Katri Mohamed. I was in charge of the Android client part while Katri took care of server part. It was very happy to work with this nice buddy and I learnt a lot from him. He graduated that semester,  so I have to continue work on the project as a open source project as promised in the project proposal.
 
 Although we have implemented many functionalities and the code can run successfully, many redundant code exists and there's no proper comments. Besides, many warning exists and the code is not fully tested, so I believe there are many bugs to be explored. Moreover, there are many other interesting functions to be implemented. As a result, I plan to continue working on this project during next semester.
+
+## Screenshot
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_1.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_2.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_3.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_4.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_5.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_6.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_7.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_8.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_9.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_10.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_11.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_12.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_13.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_14.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_15.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_16.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_17.png" height="420" width="240"/>
