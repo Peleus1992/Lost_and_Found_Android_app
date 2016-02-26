@@ -26,11 +26,10 @@ import javax.inject.Named;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.SearchHelper;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.tasks.FoundMatchDeferredTask;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.tasks.LostMatchDeferredTask;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 @Api(
         name = "myApi",

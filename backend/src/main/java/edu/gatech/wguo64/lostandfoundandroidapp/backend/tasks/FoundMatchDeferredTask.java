@@ -1,20 +1,18 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.backend.tasks;
 
 import com.google.api.server.spi.response.CollectionResponse;
-import com.google.appengine.api.search.ScoredDocument;
 import com.google.appengine.api.taskqueue.DeferredTask;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.NotificationHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.NotificationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Report;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.SearchHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 public class FoundMatchDeferredTask implements DeferredTask {
         // TODO add time lost and creation to query

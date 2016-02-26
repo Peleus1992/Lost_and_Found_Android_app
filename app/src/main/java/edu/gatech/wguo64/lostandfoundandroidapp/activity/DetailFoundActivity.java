@@ -21,6 +21,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.plus.PlusShare;
 
 import java.io.IOException;
 
@@ -28,6 +29,7 @@ import java.io.IOException;
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.GeoPt;
+import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
@@ -88,6 +90,31 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
             case R.id.commentBtn:
                 break;
             case R.id.shareBtn:
+                PlusShare.Builder builder = new PlusShare.Builder(this);
+
+                // Set call-to-action metadata.
+                builder.addCallToAction(
+                        "CREATE_ITEM", /** call-to-action button label */
+                        Uri.parse("http://plus.google.com/pages/create"), /** call-to-action url (for desktop use) */
+                        "/pages/create" /** call to action deep-link ID (for mobile use), 512 characters or fewer */);
+
+                // Set the content url (for desktop use).
+                builder.setContentUrl(Uri.parse("https://plus.google.com/pages/"));
+
+                // Set the target deep-link ID (for mobile use).
+                builder.setContentDeepLinkId("/pages/",
+                        null, null, null);
+
+                // Set the share text.
+                String text = "Found Report by " + report.getUserEmail() + "\r\n"
+                        + "Title: " + report.getTitle() + "\r\n"
+                        + "Description: " + report.getDescription() + "\r\n"
+                        + "When: " + report.getTimeFound() + "\r\n"
+                        + "Where: " + LocationHelper.getAddress(this, new LatLng(report.getLocation().getLatitude()
+                        , report.getLocation().getLongitude())) + "\r\n"
+                        + "Photo url: " + report.getPhotoUrl();
+                builder.setText(text);
+                this.startActivityForResult(builder.getIntent(), 0);
                 break;
         }
     }

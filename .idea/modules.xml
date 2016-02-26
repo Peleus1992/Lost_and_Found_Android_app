@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LostandFoundAndroidapp.iml" filepath="$PROJECT_DIR$/LostandFoundAndroidapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Lost_and_Found_Android_app.iml" filepath="$PROJECT_DIR$/Lost_and_Found_Android_app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/backend/backend.iml" filepath="$PROJECT_DIR$/backend/backend.iml" />
     </modules>

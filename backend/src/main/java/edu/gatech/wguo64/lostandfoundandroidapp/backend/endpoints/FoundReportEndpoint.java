@@ -29,10 +29,10 @@ import javax.inject.Named;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Response;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.SearchHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.tasks.FoundMatchDeferredTask;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 /**
  * WARNING: This generated code is intended as a sample or starting point for

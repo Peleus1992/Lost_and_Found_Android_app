@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,13 +19,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.plus.PlusShare;
+
 import java.io.IOException;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.fragment.MyPostFragment;
+import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
@@ -88,13 +94,6 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                 ? (myReport.getStatus() ? "Found" : "Not Found")
                 : (myReport.getStatus() ? "Returned" : "Not Returned"));
         viewHolder.statusTxt.setTextColor(myReport.getStatus() ? Color.GREEN : Color.RED);
-        //Email button
-        viewHolder.emailBtn.setOnClickListener(this);
-        viewHolder.emailBtn.setTag(report.getUserEmail());
-        //Comment button
-        viewHolder.commentBtn.setOnClickListener(this);
-        //Share button
-        viewHolder.shareBtn.setOnClickListener(this);
         //Status button
         if(myReport.getStatus()) {
             viewHolder.statusBtn.setVisibility(View.GONE);
@@ -120,17 +119,6 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.emailBtn:
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", (String) v.getTag(), null));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-                emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
-                context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                break;
-            case R.id.commentBtn:
-                break;
-            case R.id.shareBtn:
-                break;
             case R.id.statusBtn:
                 if(v.getTag() != null && v.getTag() instanceof Long) {
                     updateStatus((Long) v.getTag());
@@ -158,9 +146,6 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         public TextView timestampTxt;
         public TextView descriptionTxt;
         public TextView statusTxt;
-        public Button emailBtn;
-        public Button commentBtn;
-        public Button shareBtn;
         public Button statusBtn;
         public Button deleteBtn;
 
@@ -171,9 +156,6 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             timestampTxt = (TextView) itemView.findViewById(R.id.timestampTxt);
             descriptionTxt = (TextView) itemView.findViewById(R.id.descriptionTxt);
             statusTxt = (TextView) itemView.findViewById(R.id.statusTxt);
-            emailBtn = (Button) itemView.findViewById(R.id.emailBtn);
-            commentBtn = (Button) itemView.findViewById(R.id.commentBtn);
-            shareBtn = (Button) itemView.findViewById(R.id.shareBtn);
             statusBtn = (Button) itemView.findViewById(R.id.statusBtn);
             deleteBtn = (Button) itemView.findViewById(R.id.deleteBtn);
         }
@@ -187,7 +169,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                new AsyncTask<Long, Void, MyReport>() {
+                new AsyncTask<Long, Void, Void>() {
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -198,13 +180,13 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     }
 
                     @Override
-                    protected MyReport doInBackground(Long...params) {
+                    protected Void doInBackground(Long...params) {
                         if(params[0] == null) {
                             Log.d(TAG, "Alert User: ID is null.");
                             return null;
                         }
                         try {
-                            return Api.getClient().myReport().updateStatus(params[0]).execute();
+                            Api.getClient().myReport().updateStatus(params[0]).execute();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -212,15 +194,10 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     }
 
                     @Override
-                    protected void onPostExecute(MyReport myReport) {
+                    protected void onPostExecute(Void v) {
 
-                        super.onPostExecute(myReport);
+                        super.onPostExecute(v);
                         progressDialog.dismiss();
-                        if(myReport == null || !myReport.getStatus()) {
-                            Toast.makeText(context, "Update status failed. Please try layer.", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(context, "Update status success.", Toast.LENGTH_SHORT).show();
-                        }
                         fragment.updateObjects();
                     }
                 }.execute(id);

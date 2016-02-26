@@ -6,13 +6,13 @@ import com.google.appengine.api.taskqueue.DeferredTask;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.NotificationHelper;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.SearchHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.NotificationHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Report;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 public class LostMatchDeferredTask implements DeferredTask {
         // TODO add time lost and creation to query

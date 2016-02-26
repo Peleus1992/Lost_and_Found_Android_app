@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +13,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.plus.PlusShare;
+
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.MainActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.fragment.LostFragment;
+import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
@@ -86,6 +93,7 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
         viewHolder.commentBtn.setOnClickListener(this);
         //Share button
         viewHolder.shareBtn.setOnClickListener(this);
+        viewHolder.shareBtn.setTag(report);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +116,31 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
             case R.id.commentBtn:
                 break;
             case R.id.shareBtn:
+                PlusShare.Builder builder = new PlusShare.Builder((AppCompatActivity)context);
+
+                // Set call-to-action metadata.
+                builder.addCallToAction(
+                        "CREATE_ITEM", /** call-to-action button label */
+                        Uri.parse("http://plus.google.com/pages/create"), /** call-to-action url (for desktop use) */
+                        "/pages/create" /** call to action deep-link ID (for mobile use), 512 characters or fewer */);
+
+                // Set the content url (for desktop use).
+                builder.setContentUrl(Uri.parse("https://plus.google.com/pages/"));
+
+                // Set the target deep-link ID (for mobile use).
+                builder.setContentDeepLinkId("/pages/",
+                        null, null, null);
+
+                // Set the share text.
+                LostReport report = (LostReport)v.getTag();
+                String text = "Lost Report by " + report.getUserEmail() + "\r\n"
+                        + "Title: " + report.getTitle() + "\r\n"
+                        + "Description: " + report.getDescription() + "\r\n"
+                        + "When: " + report.getTimeLost() + "\r\n"
+                        + "Where: " + LocationHelper.getAddress(context, new LatLng(report.getLocation().getLatitude()
+                            , report.getLocation().getLongitude()));
+                builder.setText(text);
+                ((AppCompatActivity)context).startActivityForResult(builder.getIntent(), 0);
                 break;
 
         }

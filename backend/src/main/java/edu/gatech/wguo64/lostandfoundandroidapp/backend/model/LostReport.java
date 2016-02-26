@@ -16,7 +16,6 @@ public class LostReport extends Report {
     @Index
     Date timeLost;
     GeoPt location;
-    @Index
     boolean found;
 
     public LostReport() {

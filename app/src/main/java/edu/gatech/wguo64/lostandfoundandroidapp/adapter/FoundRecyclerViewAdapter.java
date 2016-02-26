@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.plus.PlusShare;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -22,6 +26,8 @@ import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
@@ -100,6 +106,7 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
         viewHolder.commentBtn.setOnClickListener(this);
         //Share button
         viewHolder.shareBtn.setOnClickListener(this);
+        viewHolder.shareBtn.setTag(report);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,6 +129,32 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
             case R.id.commentBtn:
                 break;
             case R.id.shareBtn:
+                PlusShare.Builder builder = new PlusShare.Builder((AppCompatActivity)context);
+
+                // Set call-to-action metadata.
+                builder.addCallToAction(
+                        "CREATE_ITEM", /** call-to-action button label */
+                        Uri.parse("http://plus.google.com/pages/create"), /** call-to-action url (for desktop use) */
+                        "/pages/create" /** call to action deep-link ID (for mobile use), 512 characters or fewer */);
+
+                // Set the content url (for desktop use).
+                builder.setContentUrl(Uri.parse("https://plus.google.com/pages/"));
+
+                // Set the target deep-link ID (for mobile use).
+                builder.setContentDeepLinkId("/pages/",
+                        null, null, null);
+
+                // Set the share text.
+                FoundReport report = (FoundReport)v.getTag();
+                String text = "Found Report by " + report.getUserEmail() + "\r\n"
+                        + "Title: " + report.getTitle() + "\r\n"
+                        + "Description: " + report.getDescription() + "\r\n"
+                        + "When: " + report.getTimeFound() + "\r\n"
+                        + "Where: " + LocationHelper.getAddress(context, new LatLng(report.getLocation().getLatitude()
+                        , report.getLocation().getLongitude())) + "\r\n"
+                        + "Photo url: " + report.getPhotoUrl();
+                builder.setText(text);
+                ((AppCompatActivity)context).startActivityForResult(builder.getIntent(), 0);
                 break;
 
         }

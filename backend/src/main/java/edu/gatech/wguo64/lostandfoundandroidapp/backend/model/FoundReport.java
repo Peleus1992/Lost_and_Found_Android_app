@@ -20,7 +20,6 @@ public class FoundReport extends Report {
     GeoPt location;
     String imageURL;
     String imageKey;
-    @Index
     boolean returned;
 
     public FoundReport() {

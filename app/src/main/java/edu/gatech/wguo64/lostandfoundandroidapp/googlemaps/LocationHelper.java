@@ -3,6 +3,7 @@ package edu.gatech.wguo64.lostandfoundandroidapp.googlemaps;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -21,11 +22,13 @@ import java.util.Locale;
  * Created by guoweidong on 11/3/15.
  */
 public class LocationHelper {
+    public static final String TAG = LocationHelper.class.getName();
+
     private static final String URL_GOOGLE_MAP_PLACE_AUTOCOMPLETE = "https://maps.googleapis.com/maps/api/place/autocomplete/";
     private static final String URL_GOOGLE_MAP_GEOCODE = "https://maps.googleapis.com/maps/api/geocode/";
     private static final String URL_OUTPUT_FORMAT = "json";
     // This key should be different when application changes
-    private static final String GOOGLE_MAP_BROWSER_KEY = "AIzaSyDC3r_jmFqSdDTRlCD9c5k96kQ_d35TwDE";
+    private static final String GOOGLE_MAP_BROWSER_KEY = "AIzaSyB9GayQ0Myn1MaEUHnPyUVvGFy2NkbnKhY";
 
     /**
      * This method must not be run in UI thread
@@ -67,6 +70,7 @@ public class LocationHelper {
                 }
                 address = sb.toString();
             }
+            Log.d(TAG, "address: " + address);
         } catch (Exception e) {
             e.printStackTrace();
         }

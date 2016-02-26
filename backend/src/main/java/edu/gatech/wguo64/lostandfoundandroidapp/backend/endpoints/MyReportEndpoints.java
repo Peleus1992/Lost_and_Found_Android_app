@@ -12,8 +12,6 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.VoidWork;
-import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -29,9 +27,9 @@ import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Report;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.SearchHelper;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 /**
  * WARNING: This generated code is intended as a sample or starting point for
@@ -114,7 +112,7 @@ public class MyReportEndpoints {
             name = "myReport.updateStatus",
             path = "myReport/updateStatus",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public MyReport updateStatus(
+    public void updateStatus(
             @Named("id") final Long id
             , final User user) throws OAuthRequestException {
         if (user == null) {
@@ -127,35 +125,21 @@ public class MyReportEndpoints {
 
 
         Report report = ofy().load().type(Report.class).id(id).now();
-        MyReport myReport = null;
+        if(report == null) {
+            logger.warning("Update LostReport Status: id not found.");
+            return;
+        }
         if (report instanceof LostReport) {
             LostReport lostReport = (LostReport) report;
-//            lostReport.setFound(true);
-            if (ofy().load().type(LostReport.class).id(id).now() != null) {
-//                ofy().save().entity(lostReport).now();
-                lostReport.setFound(true);
-                myReport = new MyReport(lostReport, true, true);
-            } else {
-                logger.warning("Update LostReport Status: id not found.");
-            }
-
+            lostReport.setFound(true);
+            ofy().save().entities(lostReport).now();
         } else if (report instanceof FoundReport) {
             FoundReport foundReport = (FoundReport) report;
-//            foundReport.setReturned(true);
-            if (ofy().load().type(FoundReport.class).id(id).now() != null) {
-//                ofy().save().entity(foundReport).now();
-                foundReport.setReturned(true);
-                myReport = new MyReport(foundReport, false, true);
-            } else {
-                logger.warning("Update FoundReport Status: id not found.");
-            }
-
+            foundReport.setReturned(true);
+            ofy().save().entities(foundReport).now();
         } else {
             logger.warning("Update Report Status: unknown class.");
         }
-
-        return myReport;
-
     }
 
     /**

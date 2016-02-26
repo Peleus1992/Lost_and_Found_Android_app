@@ -6,9 +6,6 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.VoidWork;
-import com.googlecode.objectify.Work;
-import com.sun.javafx.fxml.expression.Expression;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +15,7 @@ import javax.annotation.Nonnull;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.TokenRegistration;
 
-import static edu.gatech.wguo64.lostandfoundandroidapp.backend.OfyService.ofy;
+import static edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.OfyService.ofy;
 
 /**
  * Created by mkatri on 12/3/15.
