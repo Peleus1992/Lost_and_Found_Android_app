@@ -111,7 +111,7 @@ public class MyReportEndpoints {
     @ApiMethod(
             name = "myReport.updateStatus",
             path = "myReport/updateStatus",
-            httpMethod = ApiMethod.HttpMethod.PUT)
+            httpMethod = ApiMethod.HttpMethod.POST)
     public void updateStatus(
             @Named("id") final Long id
             , final User user) throws OAuthRequestException {

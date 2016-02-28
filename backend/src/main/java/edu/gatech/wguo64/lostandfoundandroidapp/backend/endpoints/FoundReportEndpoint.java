@@ -165,7 +165,7 @@ public class FoundReportEndpoint {
     /**
      * Updates an existing {@code FoundReport}.
      *
-     * @param foundReport the desired state of the entity
+     * @param id the id of report
      * @param user          the user of the entity to be updated
      * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an
@@ -173,30 +173,27 @@ public class FoundReportEndpoint {
      *                           {@code FoundReport}
      */
     @ApiMethod(
-            name = "foundReport.update",
-            path = "foundReport/update",
+            name = "foundReport.updateStatus",
+            path = "foundReport/updateStatus",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void update(final FoundReport foundReport, User user)
+    public void update(@Named("id") final Long id, User user)
             throws OAuthRequestException, BadRequestException, NotFoundException {
         if (user == null) {
             logger.warning("Not logged in.");
             throw new OAuthRequestException("You need to login to modify reports.");
         }
 
-        if (foundReport.getId() == null) {
+        if (id == null) {
             throw new BadRequestException("Invalid report object.");
         }
 
-        if(user.getUserId() != foundReport.getUserId()) {
-            throw new BadRequestException("Invalid User id.");
-        }
-
-        final Long id = foundReport.getId();
         //transaction
         ofy().transact(new Work<VoidWork>() {
             @Override
             public VoidWork run() {
-                if (ofy().load().type(FoundReport.class).id(id).now() != null) {
+                FoundReport foundReport = null;
+                if ((foundReport = ofy().load().type(FoundReport.class).id(id).now()) != null) {
+                    foundReport.setReturned(true);
                     ofy().save().entity(foundReport).now();
                 } else {
                     logger.warning("Update FoundReport: id not found.");

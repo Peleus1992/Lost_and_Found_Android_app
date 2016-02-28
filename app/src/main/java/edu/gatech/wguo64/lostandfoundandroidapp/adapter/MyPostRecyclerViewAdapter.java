@@ -101,7 +101,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             viewHolder.statusBtn.setVisibility(View.VISIBLE);
             viewHolder.statusBtn.setText(myReport.getIsLostReport() ? "I have found it" : "I have returned it");
             viewHolder.statusBtn.setOnClickListener(this);
-            viewHolder.statusBtn.setTag(report.getId());
+            viewHolder.statusBtn.setTag(myReport);
         }
 
         //Delete button
@@ -120,8 +120,8 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.statusBtn:
-                if(v.getTag() != null && v.getTag() instanceof Long) {
-                    updateStatus((Long) v.getTag());
+                if(v.getTag() != null && v.getTag() instanceof MyReport) {
+                    updateStatus((MyReport)v.getTag());
                 }
                 break;
             case R.id.deleteBtn:
@@ -162,14 +162,14 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     }
 
-    private void updateStatus(final Long id) {
+    private void updateStatus(final MyReport myReport) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setMessage("Are you sure,You wanted to change status?");
 
         alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                new AsyncTask<Long, Void, Void>() {
+                new AsyncTask<MyReport, Void, Void>() {
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -180,13 +180,19 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     }
 
                     @Override
-                    protected Void doInBackground(Long...params) {
-                        if(params[0] == null) {
-                            Log.d(TAG, "Alert User: ID is null.");
+                    protected Void doInBackground(MyReport...params) {
+                        if(params == null || params[0] == null) {
+                            Log.d(TAG, "My Report is null.");
                             return null;
                         }
                         try {
-                            Api.getClient().myReport().updateStatus(params[0]).execute();
+                            if(params[0].getIsLostReport()) {
+                                Log.d(TAG, "update: lost report " + params[0].getReport().getId());
+                                Api.getClient().lostReport().updateStatus(params[0].getReport().getId()).execute();
+                            } else {
+                                Log.d(TAG, "update: found report " + params[0].getReport().getId());
+                                Api.getClient().foundReport().updateStatus(params[0].getReport().getId()).execute();
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -200,7 +206,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                         progressDialog.dismiss();
                         fragment.updateObjects();
                     }
-                }.execute(id);
+                }.execute(myReport);
             }
         });
 

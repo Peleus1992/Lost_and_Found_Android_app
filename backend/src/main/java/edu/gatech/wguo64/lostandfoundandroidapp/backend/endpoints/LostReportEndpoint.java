@@ -109,17 +109,17 @@ public class LostReportEndpoint {
     /**
      * Updates an existing {@code LostReport}.
      *
-     * @param lostReport the desired state of the entity
+     * @param id the id of report
      * @return the updated version of the entity
      * @throws NotFoundException if the {@code id} does not correspond to an
      *                           existing
      *                           {@code LostReport}
      */
     @ApiMethod(
-            name = "lostReport.update",
-            path = "lostReport/update",
+            name = "lostReport.updateStatus",
+            path = "lostReport/updateStatus",
             httpMethod = ApiMethod.HttpMethod.PUT)
-    public void update(final LostReport lostReport, User user)
+    public void update(@Named("id") final Long id, User user)
             throws NotFoundException, BadRequestException, OAuthRequestException {
 
         if (user == null) {
@@ -127,20 +127,17 @@ public class LostReportEndpoint {
             throw new OAuthRequestException("You need to login to modify reports.");
         }
 
-        if (lostReport.getId() == null) {
+        if (id == null) {
             throw new BadRequestException("Invalid report object.");
         }
 
-        if(user.getUserId() != lostReport.getUserId()) {
-            throw new BadRequestException("Invalid User id.");
-        }
-
-        final Long id = lostReport.getId();
         //transaction
         ofy().transact(new Work<VoidWork>() {
             @Override
             public VoidWork run() {
-                if (ofy().load().type(LostReport.class).id(id).now() != null) {
+                LostReport lostReport = null;
+                if ((lostReport = ofy().load().type(LostReport.class).id(id).now()) != null) {
+                    lostReport.setFound(true);
                     ofy().save().entity(lostReport).now();
                 } else {
                     logger.warning("Update LostReport: id not found.");

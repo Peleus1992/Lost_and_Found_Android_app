@@ -92,6 +92,7 @@ public class LostFragment extends Fragment implements SwipyRefreshLayout.OnRefre
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            swipyRefreshLayout.setEnabled(false);
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             adapter.clearObjects();
@@ -123,6 +124,7 @@ public class LostFragment extends Fragment implements SwipyRefreshLayout.OnRefre
             }
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             adapter.addObjects(lostReports);
         }
