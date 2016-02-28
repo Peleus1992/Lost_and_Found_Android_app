@@ -131,6 +131,11 @@ public class LostFragment extends Fragment implements SwipyRefreshLayout.OnRefre
     }
 
     private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseLostReport> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            swipyRefreshLayout.setEnabled(false);
+        }
 
         @Override
         protected CollectionResponseLostReport doInBackground(String... params) {
@@ -156,6 +161,7 @@ public class LostFragment extends Fragment implements SwipyRefreshLayout.OnRefre
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             //set data for list
             adapter.addObjects(lostReports);

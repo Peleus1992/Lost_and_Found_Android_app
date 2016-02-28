@@ -95,6 +95,7 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
             super.onPreExecute();
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
+            swipyRefreshLayout.setEnabled(false);
             adapter.clearObjects();
         }
 
@@ -125,12 +126,18 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
             }
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             adapter.addObjects(foundReports);
         }
     }
 
     private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseFoundReport> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            swipyRefreshLayout.setEnabled(false);
+        }
 
         @Override
         protected CollectionResponseFoundReport doInBackground(String... params) {
@@ -156,6 +163,7 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             //set data for list
             adapter.addObjects(foundReports);

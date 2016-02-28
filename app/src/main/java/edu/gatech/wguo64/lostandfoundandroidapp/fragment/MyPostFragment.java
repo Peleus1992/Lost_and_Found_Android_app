@@ -95,6 +95,7 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
             super.onPreExecute();
             recyclerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
+            swipyRefreshLayout.setEnabled(false);
             adapter.clearObjects();
         }
 
@@ -124,12 +125,18 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
             }
             recyclerView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             adapter.addObjects(myReports);
         }
     }
 
     private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseMyReport> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            swipyRefreshLayout.setEnabled(false);
+        }
 
         @Override
         protected CollectionResponseMyReport doInBackground(String... params) {
@@ -155,6 +162,7 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
+            swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             //set data for list
             adapter.addObjects(myReports);
