@@ -1,8 +1,10 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -10,14 +12,18 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,8 +35,10 @@ import com.google.android.gms.common.api.Status;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.ViewPagerAdapter;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Feedback;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.RequestCodes;
+import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.notification.RegistrationIntentService;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
 
@@ -244,7 +252,72 @@ public class MainActivity extends AppCompatActivity implements NavigationView
                 break;
             case R.id.menu_item_my_posts:
                 viewPager.setCurrentItem(2);
+            case R.id.menu_item_help:
+                startFeedbackDialog();
                 break;
+        }
+    }
+
+    private void startFeedbackDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Feedback");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected;
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String content = input.getText().toString();
+                if(content.length() < 10) {
+                    Toast.makeText(MainActivity.this, "Feedback should be at least 10 characters.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Feedback feedback = new Feedback();
+                feedback.setUserEmail(preferences.getString(Preferences.ACCOUNT_NAME, null));
+                feedback.setContent(content);
+                new FeedbackUploader().execute(feedback);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private class FeedbackUploader extends AsyncTask<Feedback, Void, Feedback> {
+        @Override
+        protected Feedback doInBackground(Feedback... params) {
+            try {
+                if(params.length > 0 && params[0] != null) {
+                    return Api.getClient().feedback().insertFeedback(params[0]).execute();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Feedback feedback) {
+            super.onPostExecute(feedback);
+            if(feedback != null) {
+                Toast.makeText(MainActivity.this
+                        , "Successfully submit feedback! Thank you for your time!"
+                        , Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this
+                        , "Sorry, feedback is not successfully submitted."
+                        , Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

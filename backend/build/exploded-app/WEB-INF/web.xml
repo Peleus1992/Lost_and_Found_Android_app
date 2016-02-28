@@ -16,7 +16,8 @@
             <param-value>edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.FoundReportEndpoint,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.LostReportEndpoint,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.MyReportEndpoints,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.NotificationEndpoint</param-value>
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.NotificationEndpoint,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.FeedbackEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
