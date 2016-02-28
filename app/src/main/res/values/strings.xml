@@ -49,7 +49,7 @@
     <string name="title_activity_select_search">SelectSearchActivity</string>
     <string name="title_activity_search_report">SearchReportActivity</string>
     <string name="title_activity_comment">CommentActivity</string>
-
+    <string name="title_activity_settings">SettingsActivity</string>
     <!-- failure messages-->
     <string name="failure_search">The search functions is not availabe.</string>
     <string name="failure_log_out">Log out failed.</string>

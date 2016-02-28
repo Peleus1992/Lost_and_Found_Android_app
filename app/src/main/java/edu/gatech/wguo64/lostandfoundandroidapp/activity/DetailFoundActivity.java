@@ -204,9 +204,11 @@ public class DetailFoundActivity extends AppCompatActivity implements View.OnCli
         //Timestamp
         timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description
-        descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        descriptionTxt.setText(report.getDescription());
         //Object Image
-        new ImageDownloader(objectImage).execute(report.getImageURL());
+        if(report.getImageURL() != null) {
+            new ImageDownloader(objectImage).execute(report.getImageURL());
+        }
         //Status
         statusTxt.setText(report.getReturned() ? "Returned" : "Not Returned");
         statusTxt.setTextColor(report.getReturned() ? Color.GREEN : Color.RED);

@@ -252,8 +252,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView
                 break;
             case R.id.menu_item_my_posts:
                 viewPager.setCurrentItem(2);
+                break;
             case R.id.menu_item_help:
                 startFeedbackDialog();
+                break;
+            case R.id.menu_item_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
         }
     }

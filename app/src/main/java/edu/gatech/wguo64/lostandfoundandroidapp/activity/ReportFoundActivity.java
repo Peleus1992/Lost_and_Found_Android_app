@@ -88,6 +88,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
     Marker marker;
     GeoPt geoPt;
     String imageName;
+    boolean hasImage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,10 +287,11 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
             protected Void doInBackground(Drawable...
                                                   params) {
                 try {
-                    ImageUploader.ImageInfo imageInfo = ImageUploader.upload(params[0]);
-
-                    report.setImageKey(imageInfo.imageKey);
-                    report.setImageURL(imageInfo.imageURL);
+                    if (hasImage) {
+                        ImageUploader.ImageInfo imageInfo = ImageUploader.upload(params[0]);
+                        report.setImageKey(imageInfo.imageKey);
+                        report.setImageURL(imageInfo.imageURL);
+                    }
                     Api.getClient().foundReport().insert(report)
                             .execute();
                 } catch (IOException e) {
@@ -405,6 +407,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
                     Drawable drawable = BitmapDrawable.createFromPath
                             (imageFile.getPath());
                     objectImage.setImageDrawable(drawable);
+                    hasImage = true;
                 }
             }
         } else if (requestCode == RequestCodes.SELECT_PICTURE) {
@@ -418,6 +421,7 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
                     Drawable drawable = BitmapDrawable.createFromStream(in,
                             "image");
                     objectImage.setImageDrawable(drawable);
+                    hasImage = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

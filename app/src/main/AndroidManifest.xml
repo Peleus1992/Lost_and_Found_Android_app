@@ -80,6 +80,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".activity.SearchReportActivity"
             android:label="@string/title_activity_search_report"
             android:launchMode="singleTop"

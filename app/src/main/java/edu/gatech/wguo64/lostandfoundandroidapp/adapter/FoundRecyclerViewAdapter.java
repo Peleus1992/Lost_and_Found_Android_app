@@ -91,7 +91,9 @@ public class FoundRecyclerViewAdapter extends RecyclerView.Adapter<FoundRecycler
         viewHolder.descriptionTxt.setOnClickListener(this);
         viewHolder.descriptionTxt.setTag(report.getId());
         //Object image
-        new ImageDownloader(viewHolder.objectImage).execute(report.getImageURL());
+        if(report.getImageURL() != null) {
+            new ImageDownloader(viewHolder.objectImage).execute(report.getImageURL());
+        }
         viewHolder.objectImage.setOnClickListener(this);
         viewHolder.objectImage.setTag(report.getId());
         //Status
