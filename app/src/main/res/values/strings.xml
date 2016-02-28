@@ -48,6 +48,7 @@
     <string name="title_activity_detail_found">DetailFoundActivity</string>
     <string name="title_activity_select_search">SelectSearchActivity</string>
     <string name="title_activity_search_report">SearchReportActivity</string>
+    <string name="title_activity_comment">CommentActivity</string>
 
     <!-- failure messages-->
     <string name="failure_search">The search functions is not availabe.</string>
@@ -56,4 +57,7 @@
     <!-- progress dialog-->
     <string name="progress_dialog_title_update">Updateing ...</string>
     <string name="progress_dialog_message_please_wait">Please wait ...</string>
+    <!-- MyPost setTag -->
+    <string name="tag_report_id">tagReportId</string>
+    <string name="tag_is_lost_report">tagIsLostReport</string>
 </resources>

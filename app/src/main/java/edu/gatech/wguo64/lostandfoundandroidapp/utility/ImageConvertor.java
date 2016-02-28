@@ -14,8 +14,8 @@ import biz.source_code.base64Coder.Base64Coder;
  * Created by guoweidong on 11/24/15.
  */
 public class ImageConvertor {
-    public final static int IMAGE_WIDTH = 640;
-    public final static int IMAGE_HEIGHT = 480;
+    public final static int IMAGE_WIDTH = 480;
+    public final static int IMAGE_HEIGHT = 640;
     public final static int ICON_WIDTH = 128;
     public final static int ICON_HEIGHT = 96;
     public static String drawableToString(Drawable drawable) {

@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
@@ -83,12 +85,22 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         final Report report = myReport.getReport();
         viewHolder.reportTypeImg.setImageDrawable(context.getDrawable(myReport.getIsLostReport()
                 ? R.drawable.ic_lost_red_56dp : R.drawable.ic_found_green_56dp));
+        viewHolder.reportTypeImg.setOnClickListener(this);
+        viewHolder.reportTypeImg.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
+        viewHolder.reportTypeImg.setTag(R.string.tag_report_id, report.getId());
         //Title
         viewHolder.titleTxt.setText(report.getTitle());
+        viewHolder.titleTxt.setOnClickListener(this);
+        viewHolder.titleTxt.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
+        viewHolder.titleTxt.setTag(R.string.tag_report_id, report.getId());
+
         //Timestamp
         viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description
         viewHolder.descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        viewHolder.descriptionTxt.setOnClickListener(this);
+        viewHolder.descriptionTxt.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
+        viewHolder.descriptionTxt.setTag(R.string.tag_report_id, report.getId());
         //Status
         viewHolder.statusTxt.setText(myReport.getIsLostReport()
                 ? (myReport.getStatus() ? "Found" : "Not Found")
@@ -119,6 +131,19 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.reportTypeImg:
+            case R.id.descriptionTxt:
+            case R.id.titleTxt:
+                if((v.getTag(R.string.tag_is_lost_report)) != null) {
+                    Intent intent = new Intent(context, ((Boolean)v.getTag(R.string.tag_is_lost_report))
+                            ? DetailLostActivity.class : DetailFoundActivity.class);
+                    intent.putExtra("reportId", (Long)v.getTag(R.string.tag_report_id));
+                    context.startActivity(intent);
+                } else {
+                    Log.d(TAG, "v.getTag(R.string.tag_is_lost_report) === null");
+                }
+
+                break;
             case R.id.statusBtn:
                 if(v.getTag() != null && v.getTag() instanceof MyReport) {
                     updateStatus((MyReport)v.getTag());

@@ -16,6 +16,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
 /**
  * Created by guoweidong on 10/24/15.
  */
+@Deprecated
 public class SearchFoundRecyclerViewAdapter extends RecyclerView.Adapter<SearchFoundRecyclerViewAdapter.ViewHolder> {
 
     private List<FoundReport> reports;

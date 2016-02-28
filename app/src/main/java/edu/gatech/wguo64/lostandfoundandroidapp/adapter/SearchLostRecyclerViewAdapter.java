@@ -17,6 +17,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
 /**
  * Created by guoweidong on 10/24/15.
  */
+@Deprecated
 public class SearchLostRecyclerViewAdapter extends RecyclerView.Adapter<SearchLostRecyclerViewAdapter.ViewHolder> {
 
     private List<LostReport> reports;

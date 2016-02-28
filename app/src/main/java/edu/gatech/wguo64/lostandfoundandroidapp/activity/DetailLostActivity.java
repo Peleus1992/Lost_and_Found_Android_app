@@ -1,16 +1,23 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,11 +31,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.PlusShare;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.adapter.CommentRecyclerViewAdapter;
+import edu.gatech.wguo64.lostandfoundandroidapp.adapter.LostRecyclerViewAdapter;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Comment;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.GeoPt;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
@@ -57,12 +70,16 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
 
     public ProgressBar progressBar;
 
+    public SharedPreferences preferences;
+
     public final static String TITLE = "Detailed Lost Report";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_lost);
+        //Preferences
+        preferences = getSharedPreferences(getPackageName(), MODE_PRIVATE);
         // Get LostReport
         Intent intent = getIntent();
         Long reportId = intent.getLongExtra("reportId", -1);
@@ -85,9 +102,13 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                 startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 break;
-            case R.id.commentBtn:
+            case R.id.commentBtn: {
+                Intent intent = new Intent(this, CommentActivity.class);
+                intent.putExtra("reportId", report.getId());
+                startActivity(intent);
                 break;
-            case R.id.shareBtn:
+            }
+            case R.id.shareBtn: {
                 PlusShare.Builder builder = new PlusShare.Builder(this);
 
                 // Set call-to-action metadata.
@@ -104,15 +125,16 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
                         null, null, null);
 
                 // Set the share text.
-                String text = "Lost Report by " + report.getUserEmail() + "\r\n"
-                        + "Title: " + report.getTitle() + "\r\n"
-                        + "Description: " + report.getDescription() + "\r\n"
-                        + "When: " + report.getTimeLost() + "\r\n"
-                        + "Where: " + LocationHelper.getAddress(this, new LatLng(report.getLocation().getLatitude()
-                        , report.getLocation().getLongitude()));
+                String text = "Lost Report by " + report.getUserEmail() + "\r\n" + "\r\n"
+                        + "Title: " + report.getTitle() + "\r\n" + "\r\n"
+                        + "Description: " + report.getDescription() + "\r\n" + "\r\n"
+                        + "When: " + (report.getTimeLost() == null ? "Not clear." : report.getTimeLost()) + "\r\n" + "\r\n"
+                        + "Where: " + (report.getLocation() == null ? "Not clear." : LocationHelper.getAddress(this, new LatLng(report.getLocation().getLatitude()
+                        , report.getLocation().getLongitude()))) + "\r\n";
                 builder.setText(text);
                 this.startActivityForResult(builder.getIntent(), 0);
                 break;
+            }
         }
     }
 
@@ -209,6 +231,7 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
             markLocation(report.getLocation());
         }
 
+        //Progressbar
         progressBar.setVisibility(View.GONE);
     }
 
@@ -229,8 +252,11 @@ public class DetailLostActivity extends AppCompatActivity implements View.OnClic
             // Zoom in the Google Map
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
+            String markerTitle = LocationHelper.getAddress(this, latLng);
+            markerTitle = "".equals(markerTitle) ? "Latitude: " + latitude
+                    + ", Longitude: " + longitude : markerTitle;
             MarkerOptions marker = new MarkerOptions().position(new LatLng(latitude, longitude))
-                    .title("Latitude: " + latitude + ", Longitude: " + longitude);
+                    .title(markerTitle);
 
             // adding marker
             googleMap.addMarker(marker);

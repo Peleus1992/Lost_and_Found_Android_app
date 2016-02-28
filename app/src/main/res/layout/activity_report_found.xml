@@ -56,7 +56,8 @@
                                 android:id="@+id/titleEdit"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="textNoSuggestions"
+                                android:inputType="textNoSuggestions|textMultiLine"
+                                android:singleLine="false"
                                 android:hint="@string/hint_title"/>
                         </android.support.design.widget.TextInputLayout>
 
@@ -67,7 +68,8 @@
                                 android:id="@+id/descriptionEdit"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="textNoSuggestions"
+                                android:inputType="textNoSuggestions|textMultiLine"
+                                android:singleLine="false"
                                 android:hint="@string/hint_description"/>
                         </android.support.design.widget.TextInputLayout>
                     </LinearLayout>

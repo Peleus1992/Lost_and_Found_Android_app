@@ -53,6 +53,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.GeoPt;
 import edu.gatech.wguo64.lostandfoundandroidapp.camera.CameraHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.RequestCodes;
+import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageConvertor;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageUploader;
@@ -362,8 +363,13 @@ public class ReportFoundActivity extends AppCompatActivity implements GoogleMap.
             googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
             // adding marker
-            marker = googleMap.addMarker(new MarkerOptions().position(latLng)
-                    .title("Latitude: " + latLng.latitude + ", Longitude: " + latLng.longitude));
+            String markerTitle = LocationHelper.getAddress(this, latLng);
+            markerTitle = "".equals(markerTitle) ? "Latitude: " + latLng.latitude
+                    + ", Longitude: " + latLng.longitude : markerTitle;
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng)
+                    .title(markerTitle);
+
+            marker = googleMap.addMarker(markerOptions);
 
         } else {
             Log.d(TAG, "No such location");

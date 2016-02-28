@@ -19,6 +19,7 @@ import com.google.android.gms.plus.PlusShare;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.CommentActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.activity.MainActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.LostReport;
@@ -69,20 +70,18 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
         final LostReport report = reports.get(i);
         //User photo
         new ImageDownloader(viewHolder.userPhotoImg).execute(report.getPhotoUrl());
+        viewHolder.userPhotoImg.setOnClickListener(this);
+        viewHolder.userPhotoImg.setTag(report.getId());
         //Title
         viewHolder.titleTxt.setText(report.getTitle());
-        viewHolder.titleTxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, DetailLostActivity.class);
-                intent.putExtra("reportId", report.getId());
-                context.startActivity(intent);
-            }
-        });
+        viewHolder.titleTxt.setOnClickListener(this);
+        viewHolder.titleTxt.setTag(report.getId());
         //Timestamp
         viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description
         viewHolder.descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
+        viewHolder.descriptionTxt.setOnClickListener(this);
+        viewHolder.descriptionTxt.setTag(report.getId());
         //Status
         viewHolder.statusTxt.setText(report.getFound() ? "Found" : "Not Found");
         viewHolder.statusTxt.setTextColor(report.getFound() ? Color.GREEN : Color.RED);
@@ -91,6 +90,7 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
         viewHolder.emailBtn.setTag(report.getUserEmail());
         //Comment button
         viewHolder.commentBtn.setOnClickListener(this);
+        viewHolder.commentBtn.setTag(report.getId());
         //Share button
         viewHolder.shareBtn.setOnClickListener(this);
         viewHolder.shareBtn.setTag(report);
@@ -106,6 +106,14 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.userPhotoImg:
+            case R.id.descriptionTxt:
+            case R.id.titleTxt: {
+                Intent intent = new Intent(context, DetailLostActivity.class);
+                intent.putExtra("reportId", (Long) v.getTag());
+                context.startActivity(intent);
+                break;
+            }
             case R.id.emailBtn:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                         "mailto", (String)v.getTag(), null));
@@ -113,8 +121,12 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
                 emailIntent.putExtra(Intent.EXTRA_TEXT, "Body");
                 context.startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 break;
-            case R.id.commentBtn:
+            case R.id.commentBtn: {
+                Intent intent = new Intent(context, CommentActivity.class);
+                intent.putExtra("reportId", (Long) v.getTag());
+                context.startActivity(intent);
                 break;
+            }
             case R.id.shareBtn:
                 PlusShare.Builder builder = new PlusShare.Builder((AppCompatActivity)context);
 
@@ -133,12 +145,12 @@ public class LostRecyclerViewAdapter extends RecyclerView.Adapter<LostRecyclerVi
 
                 // Set the share text.
                 LostReport report = (LostReport)v.getTag();
-                String text = "Lost Report by " + report.getUserEmail() + "\r\n"
-                        + "Title: " + report.getTitle() + "\r\n"
-                        + "Description: " + report.getDescription() + "\r\n"
-                        + "When: " + report.getTimeLost() + "\r\n"
-                        + "Where: " + LocationHelper.getAddress(context, new LatLng(report.getLocation().getLatitude()
-                            , report.getLocation().getLongitude()));
+                String text = "Lost Report by " + report.getUserEmail() + "\r\n" + "\r\n"
+                        + "Title: " + report.getTitle() + "\r\n" + "\r\n"
+                        + "Description: " + report.getDescription() + "\r\n" + "\r\n"
+                        + "When: " + (report.getTimeLost() == null ? "Not clear." : report.getTimeLost()) + "\r\n" + "\r\n"
+                        + "Where: " + (report.getLocation() == null ? "Not clear." : LocationHelper.getAddress(context, new LatLng(report.getLocation().getLatitude()
+                        , report.getLocation().getLongitude()))) + "\r\n";
                 builder.setText(text);
                 ((AppCompatActivity)context).startActivityForResult(builder.getIntent(), 0);
                 break;

@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.constants.Credentials;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Comment;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.MyReport;
@@ -143,6 +145,64 @@ public class MyReportEndpoints {
     }
 
     /**
+     * @param comment  the id of the report
+     * @param user
+     * @return a response that encapsulates the result list and the next page
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(
+            name = "myReport.insertComment",
+            path = "myReport/insertComment",
+            httpMethod = ApiMethod.HttpMethod.POST)
+    public Comment insertComment(@Named("reportId") Long reportId, Comment comment
+            , User user) throws OAuthRequestException {
+        if (user == null) {
+            logger.exiting(FoundReportEndpoint.class.toString(), "Not logged " +
+                    "in.");
+            throw new OAuthRequestException("You need to login to list your " +
+                    "reports.");
+        }
+        if (comment == null) {
+            logger.exiting(FoundReportEndpoint.class.toString(), "Empty comment");
+            throw new OAuthRequestException("Empty comment");
+        }
+        logger.info("For user: " + user.getEmail());
+        Key<Comment> key = ofy().save().entity(comment).now();
+        Report report = ofy().load().type(Report.class).id(reportId).now();
+        if(report == null) {
+            logger.warning("Update LostReport Status: id not found.");
+            return null;
+        }
+
+        report.addComment(key);
+        ofy().save().entity(report).now();
+        return comment;
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(
+            name = "myReport.getComments",
+            path = "myReport/getComments",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public CollectionResponse<Comment> getComments(@Named("id") Long id) throws OAuthRequestException {
+
+        Report report = ofy().load().type(Report.class).id(id).now();
+        if(report == null) {
+            logger.warning("Update LostReport Status: id not found.");
+            return null;
+        }
+
+        return CollectionResponse.<Comment>builder().setItems(report.getComments()).build();
+    }
+
+
+
+    /**
      * @param id  the id of the report
      * @param user
      * @return a response that encapsulates the result list and the next page
@@ -164,6 +224,12 @@ public class MyReportEndpoints {
         logger.info("For user: " + user.getEmail());
 
         Report report = ofy().load().type(Report.class).id(id).now();
+        if(report != null) {
+            List<Comment> commentList = report.getComments();
+            for(Comment c : commentList) {
+                ofy().delete().type(Comment.class).id(c.getId());
+            }
+        }
         if (report instanceof LostReport) {
             LostReport lostReport = (LostReport) report;
             if (ofy().load().type(LostReport.class).id(id).now() != null) {

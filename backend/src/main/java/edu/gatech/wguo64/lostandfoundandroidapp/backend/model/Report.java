@@ -1,10 +1,15 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.backend.model;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Load;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by mkatri on 11/22/15.
@@ -26,9 +31,11 @@ public abstract class Report {
     String userEmail;
     String photoUrl;
 
+    List<Ref<Comment>> comments;
 
     public Report() {
         created = new Date();
+        comments = new ArrayList<>();
     }
 
     public Long getId() {
@@ -77,6 +84,21 @@ public abstract class Report {
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    public List<Comment> getComments() {
+        List<Comment> commentList = new ArrayList<>();
+        for(Ref<Comment> r : comments) {
+            if(r != null) {
+                commentList.add(r.get());
+            }
+        }
+        return commentList;
+    }
+
+    public void addComment(Key<Comment> key) {
+        Ref<Comment> r = Ref.create(key);
+        comments.add(r);
     }
 
 }
