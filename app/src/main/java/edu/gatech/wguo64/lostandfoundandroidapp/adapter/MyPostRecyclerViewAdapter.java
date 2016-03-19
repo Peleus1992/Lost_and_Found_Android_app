@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,22 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.plus.PlusShare;
 
 import java.io.IOException;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailReportActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.fragment.MyPostFragment;
-import edu.gatech.wguo64.lostandfoundandroidapp.googlemaps.LocationHelper;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.TimeConvertor;
@@ -45,13 +35,13 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     public final static String TAG = MyPostRecyclerViewAdapter.class.getName();
 
-    private List<MyReport> myReports;
+    private List<Report> myReports;
     private Context context;
     private MyPostFragment fragment;
 
     public ProgressDialog progressDialog;
 
-    public MyPostRecyclerViewAdapter(List<MyReport> myReports, Context context, MyPostFragment fragment) {
+    public MyPostRecyclerViewAdapter(List<Report> myReports, Context context, MyPostFragment fragment) {
         this.myReports = myReports;
         this.context = context;
         this.fragment = fragment;
@@ -68,7 +58,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
         }
     }
 
-    public void addObjects(List<MyReport> myReports) {
+    public void addObjects(List<Report> myReports) {
         this.myReports.addAll(myReports);
         this.notifyItemRangeInserted(getItemCount() - myReports.size(), myReports.size());
     }
@@ -81,39 +71,35 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
-        final MyReport myReport = myReports.get(i);
-        final Report report = myReport.getReport();
-        viewHolder.reportTypeImg.setImageDrawable(context.getDrawable(myReport.getIsLostReport()
+        final Report report = myReports.get(i);
+        viewHolder.reportTypeImg.setImageDrawable(context.getDrawable(report.getReportType()
                 ? R.drawable.ic_lost_red_56dp : R.drawable.ic_found_green_56dp));
         viewHolder.reportTypeImg.setOnClickListener(this);
-        viewHolder.reportTypeImg.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
-        viewHolder.reportTypeImg.setTag(R.string.tag_report_id, report.getId());
+        viewHolder.reportTypeImg.setTag(report.getId());
         //Title
         viewHolder.titleTxt.setText(report.getTitle());
         viewHolder.titleTxt.setOnClickListener(this);
-        viewHolder.titleTxt.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
-        viewHolder.titleTxt.setTag(R.string.tag_report_id, report.getId());
+        viewHolder.titleTxt.setTag(report.getId());
 
         //Timestamp
         viewHolder.timestampTxt.setText(TimeConvertor.getTimeDifferential(report.getCreated().getValue()));
         //Description
         viewHolder.descriptionTxt.setText(TextTrimmer.trim(report.getDescription()));
         viewHolder.descriptionTxt.setOnClickListener(this);
-        viewHolder.descriptionTxt.setTag(R.string.tag_is_lost_report, myReport.getIsLostReport());
-        viewHolder.descriptionTxt.setTag(R.string.tag_report_id, report.getId());
+        viewHolder.descriptionTxt.setTag(report.getId());
         //Status
-        viewHolder.statusTxt.setText(myReport.getIsLostReport()
-                ? (myReport.getStatus() ? "Found" : "Not Found")
-                : (myReport.getStatus() ? "Returned" : "Not Returned"));
-        viewHolder.statusTxt.setTextColor(myReport.getStatus() ? Color.GREEN : Color.RED);
+        viewHolder.statusTxt.setText(report.getReportType()
+                ? (report.getStatus() ? "Found" : "Not Found")
+                : (report.getStatus() ? "Returned" : "Not Returned"));
+        viewHolder.statusTxt.setTextColor(report.getStatus() ? Color.GREEN : Color.RED);
         //Status button
-        if(myReport.getStatus()) {
+        if(report.getStatus()) {
             viewHolder.statusBtn.setVisibility(View.GONE);
         } else {
             viewHolder.statusBtn.setVisibility(View.VISIBLE);
-            viewHolder.statusBtn.setText(myReport.getIsLostReport() ? "I have found it" : "I have returned it");
+            viewHolder.statusBtn.setText(report.getReportType() ? "I have found it" : "I have returned it");
             viewHolder.statusBtn.setOnClickListener(this);
-            viewHolder.statusBtn.setTag(myReport);
+            viewHolder.statusBtn.setTag(report);
         }
 
         //Delete button
@@ -134,19 +120,13 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
             case R.id.reportTypeImg:
             case R.id.descriptionTxt:
             case R.id.titleTxt:
-                if((v.getTag(R.string.tag_is_lost_report)) != null) {
-                    Intent intent = new Intent(context, ((Boolean)v.getTag(R.string.tag_is_lost_report))
-                            ? DetailLostActivity.class : DetailFoundActivity.class);
-                    intent.putExtra("reportId", (Long)v.getTag(R.string.tag_report_id));
-                    context.startActivity(intent);
-                } else {
-                    Log.d(TAG, "v.getTag(R.string.tag_is_lost_report) === null");
-                }
-
+                Intent intent = new Intent(context, DetailReportActivity.class);
+                intent.putExtra("reportId", (Long)v.getTag());
+                context.startActivity(intent);
                 break;
             case R.id.statusBtn:
-                if(v.getTag() != null && v.getTag() instanceof MyReport) {
-                    updateStatus((MyReport)v.getTag());
+                if(v.getTag() != null && v.getTag() instanceof Report) {
+                    updateStatus((Report)v.getTag());
                 }
                 break;
             case R.id.deleteBtn:
@@ -187,14 +167,14 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
 
     }
 
-    private void updateStatus(final MyReport myReport) {
+    private void updateStatus(final Report myReport) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setMessage("Are you sure,You wanted to change status?");
 
         alertDialogBuilder.setPositiveButton("yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                new AsyncTask<MyReport, Void, Void>() {
+                new AsyncTask<Report, Void, Void>() {
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -205,19 +185,14 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                     }
 
                     @Override
-                    protected Void doInBackground(MyReport...params) {
+                    protected Void doInBackground(Report...params) {
                         if(params == null || params[0] == null) {
                             Log.d(TAG, "My Report is null.");
                             return null;
                         }
                         try {
-                            if(params[0].getIsLostReport()) {
-                                Log.d(TAG, "update: lost report " + params[0].getReport().getId());
-                                Api.getClient().lostReport().updateStatus(params[0].getReport().getId()).execute();
-                            } else {
-                                Log.d(TAG, "update: found report " + params[0].getReport().getId());
-                                Api.getClient().foundReport().updateStatus(params[0].getReport().getId()).execute();
-                            }
+                            Log.d(TAG, "update: report " + params[0].getId());
+                            Api.getClient().report().updateStatus(params[0].getId()).execute();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -270,7 +245,7 @@ public class MyPostRecyclerViewAdapter extends RecyclerView.Adapter<MyPostRecycl
                             return null;
                         }
                         try {
-                            Api.getClient().myReport().delete(params[0]).execute();
+                            Api.getClient().report().remove(params[0]).execute();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

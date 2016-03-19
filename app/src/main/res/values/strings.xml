@@ -57,7 +57,4 @@
     <!-- progress dialog-->
     <string name="progress_dialog_title_update">Updateing ...</string>
     <string name="progress_dialog_message_please_wait">Please wait ...</string>
-    <!-- MyPost setTag -->
-    <string name="tag_report_id">tagReportId</string>
-    <string name="tag_is_lost_report">tagIsLostReport</string>
 </resources>

@@ -57,7 +57,7 @@ public class ImageUploader {
                     , ContentType.create("image/jpeg"), "image").build();
 
             // Get URL where the image will be uploaded
-            String url = Api.getClient().foundReport().newImageURL().execute().getStringResponse();
+            String url = Api.getClient().image().newImageUrl().execute().getStringResponse();
             HttpPost httpPost = new HttpPost(url);
             // Execute the http post
             httpPost.setEntity(httpEntity);
@@ -74,7 +74,6 @@ public class ImageUploader {
                 sb.append('\r');
             }
             rd.close();
-            Log.d("fsfs", sb.toString());
             JSONObject jsonObject = new JSONObject(sb.toString());
             ImageInfo imageInfo = new ImageInfo();
             imageInfo.imageKey = (String)jsonObject.get("imageKey");

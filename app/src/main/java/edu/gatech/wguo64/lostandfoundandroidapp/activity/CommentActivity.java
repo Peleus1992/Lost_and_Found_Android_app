@@ -30,9 +30,7 @@ import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.CommentRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchReportRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseComment;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseMyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Comment;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.constants.Preferences;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
@@ -142,7 +140,7 @@ public class CommentActivity extends AppCompatActivity {
             Long id = params[0];
             try {
                 // Cursor set "" here, because in Index and Document, the cursor return null when no more items
-                return Api.getClient().myReport().getComments(id).execute();
+                return Api.getClient().report().getComments(id).execute();
             } catch (Exception e) {
                 Log.d(TAG, "InitializeObjectsTask: " + e.getLocalizedMessage());
             }
@@ -179,7 +177,7 @@ public class CommentActivity extends AppCompatActivity {
         @Override
         protected Comment doInBackground(Comment... params) {
             try {
-                return Api.getClient().myReport().insertComment(reportId, params[0]).execute();
+                return Api.getClient().report().insertComment(reportId, params[0]).execute();
             } catch (IOException e) {
                 e.printStackTrace();
             }

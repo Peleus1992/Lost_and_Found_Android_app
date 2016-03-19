@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.NotificationHelper;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.FoundReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.LostReport;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.helpers.SearchHelper;
 
@@ -24,18 +22,18 @@ public class FoundMatchDeferredTask implements DeferredTask {
 
         @Override
         public void run() {
-            FoundReport foundReport = ofy().load().type(FoundReport.class).id(id).now();
+            Report foundReport = ofy().load().type(Report.class).id(id).now();
 
             if (foundReport == null || foundReport.getLocation() == null) {
                 return;
             }
 
             CollectionResponse<Report> reportCollectionResponse = SearchHelper
-                    .searchByLocationAndTitle(foundReport.getLocation(), foundReport.getTitle(), 50);
+                    .searchByLocationAndTitle(foundReport.getLocation(), foundReport.getTagsString(), 50);
 
             Set<String> userEmails = new HashSet<>();
             for (Report report : reportCollectionResponse.getItems()) {
-                if(report instanceof LostReport) {
+                if(report.getReportType()) {
                     userEmails.add(report.getUserEmail());
                 }
             }

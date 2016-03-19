@@ -218,23 +218,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (viewPager.getCurrentItem() == 0) {
-                    startReportLostActivity();
-                } else if (viewPager.getCurrentItem() == 1) {
-                    startReportFoundActivity();
-                }
+                startReportActivity();
             }
         });
     }
 
-    private void startReportLostActivity() {
-        Intent i = new Intent(this, ReportLostActivity.class);
-        startActivity(i);
-    }
 
-
-    private void startReportFoundActivity() {
-        Intent i = new Intent(this, ReportFoundActivity.class);
+    private void startReportActivity() {
+        Intent i = new Intent(this, ReportActivity.class);
         startActivity(i);
     }
 

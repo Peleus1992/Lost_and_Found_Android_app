@@ -22,12 +22,9 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 import java.util.ArrayList;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchFoundRecyclerViewAdapter;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.SearchReportRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseFoundReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseMyReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 public class SearchReportActivity extends AppCompatActivity implements SwipyRefreshLayout.OnRefreshListener {
@@ -107,7 +104,7 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SearchReportRecyclerViewAdapter(new
-                ArrayList<MyReport>(), this);
+                ArrayList<Report>(), this);
         recyclerView.setAdapter(adapter);
 
         swipyRefreshLayout.setOnRefreshListener(this);
@@ -129,7 +126,7 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
         new AppendObjectsTask().execute(query, cursor);
     }
 
-    private class InitializeObjectsTask extends AsyncTask<String, Void, CollectionResponseMyReport> {
+    private class InitializeObjectsTask extends AsyncTask<String, Void, CollectionResponseReport> {
 
         @Override
         protected void onPreExecute() {
@@ -140,12 +137,12 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
         }
 
         @Override
-        protected CollectionResponseMyReport doInBackground(String... params) {
+        protected CollectionResponseReport doInBackground(String... params) {
             String qry = params[0];
-            CollectionResponseMyReport reports = null;
+            CollectionResponseReport reports = null;
             try {
                 // Cursor set "" here, because in Index and Document, the cursor return null when no more items
-                reports = Api.getClient().myReport().search(qry).setCursor("").execute();
+                reports = Api.getClient().report().search(qry).setCursor("").execute();
             } catch (Exception e) {
                 Log.d(TAG, "InitializeObjectsTask: " + e.getLocalizedMessage());
             }
@@ -153,15 +150,15 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseMyReport reports) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            super.onPostExecute(reports);
-            ArrayList<MyReport> myReports = new ArrayList<>();
-            if(reports != null) {
-                if(reports.getItems() != null) {
-                    myReports.addAll(reports.getItems());
+            super.onPostExecute(collectionResponseReport);
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = reports.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
             } else {
                 Snackbar.make(rootView, R.string.failure_search, Snackbar.LENGTH_SHORT).show();
             }
@@ -169,20 +166,20 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
             progressBar.setVisibility(View.GONE);
 
             //set data for list
-            adapter.addObjects(myReports);
+            adapter.addObjects(reports);
         }
 
     }
 
-    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseMyReport> {
+    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseReport> {
 
         @Override
-        protected CollectionResponseMyReport doInBackground(String... params) {
+        protected CollectionResponseReport doInBackground(String... params) {
             String qry = params[0];
             String cur = params[1];
-            CollectionResponseMyReport reports = null;
+            CollectionResponseReport reports = null;
             try {
-                reports = Api.getClient().myReport().search(qry).setCursor(cur).execute();
+                reports = Api.getClient().report().search(qry).setCursor(cur).execute();
             } catch (Exception e) {
                 Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
             }
@@ -190,19 +187,19 @@ public class SearchReportActivity extends AppCompatActivity implements SwipyRefr
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseMyReport reports) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            ArrayList<MyReport> myReports = new ArrayList<>();
-            if(reports != null) {
-                if(reports.getItems() != null) {
-                    myReports.addAll(reports.getItems());
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = reports.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
             } else {
                 Snackbar.make(rootView, R.string.failure_search, Snackbar.LENGTH_SHORT).show();
             }
             //set data for list
-            adapter.addObjects(myReports);
+            adapter.addObjects(reports);
             swipyRefreshLayout.setRefreshing(false);
         }
 

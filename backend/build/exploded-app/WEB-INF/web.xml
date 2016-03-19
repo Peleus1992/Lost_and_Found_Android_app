@@ -13,9 +13,9 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.FoundReportEndpoint,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.LostReportEndpoint,
-                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.MyReportEndpoints,
+            <param-value>
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.ReportEndpoint,
+                edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.ImageEndpoint,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.NotificationEndpoint,
                 edu.gatech.wguo64.lostandfoundandroidapp.backend.endpoints.FeedbackEndpoint</param-value>
         </init-param>

@@ -42,7 +42,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.ReportFoundActivity"
+            android:name=".activity.ReportActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -65,7 +65,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.DetailFoundActivity"
+            android:name=".activity.DetailReportActivity"
             android:label="@string/title_activity_detail_found"
             android:screenOrientation="portrait" >
         </activity>

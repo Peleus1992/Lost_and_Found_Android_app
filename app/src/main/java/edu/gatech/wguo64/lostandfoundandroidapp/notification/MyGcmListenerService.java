@@ -29,8 +29,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
+import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailReportActivity;
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -82,12 +81,12 @@ public class MyGcmListenerService extends GcmListenerService {
         Intent intent = null;
         long reportId = -1;
         if(message.startsWith("Lost")) {
-            intent = new Intent(this, DetailLostActivity.class);
+            intent = new Intent(this, DetailReportActivity.class);
             reportId = Long.parseLong(message.substring(5));
             intent.putExtra("reportId", reportId);
             message = "Your found report may get a match!";
         } else if(message.startsWith("Found")){
-            intent = new Intent(this, DetailFoundActivity.class);
+            intent = new Intent(this, DetailReportActivity.class);
             reportId = Long.parseLong(message.substring(6));
             intent.putExtra("reportId", reportId);
             message = "Your lost report may get a match!";

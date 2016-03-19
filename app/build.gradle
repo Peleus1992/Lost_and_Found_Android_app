@@ -7,7 +7,7 @@ android {
     buildToolsVersion "23.0.1"
     defaultConfig {
         applicationId "edu.gatech.wguo64.lostandfoundandroidapp"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -39,6 +39,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.github.orangegangsters:swipy:1.2.1@aar'
+    compile 'co.lujun:androidtagview:1.0.2'
     compile group: 'cz.msebera.android' , name: 'httpclient', version: '4.4.1.1'
 }
 

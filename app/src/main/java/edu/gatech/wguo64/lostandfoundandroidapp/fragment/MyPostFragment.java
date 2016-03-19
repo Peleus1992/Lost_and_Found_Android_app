@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
 import edu.gatech.wguo64.lostandfoundandroidapp.adapter.MyPostRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseMyReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.MyReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
@@ -76,7 +76,7 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new MyPostRecyclerViewAdapter(new
-                ArrayList<MyReport>(), getContext(), this);
+                ArrayList<Report>(), getContext(), this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -88,7 +88,7 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         new AppendObjectsTask().execute(cursor);
     }
 
-    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseMyReport> {
+    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseReport> {
 
         @Override
         protected void onPreExecute() {
@@ -100,10 +100,10 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         }
 
         @Override
-        protected CollectionResponseMyReport doInBackground(Void... params) {
-            CollectionResponseMyReport reports = null;
+        protected CollectionResponseReport doInBackground(Void... params) {
+            CollectionResponseReport reports = null;
             try {
-                reports = Api.getClient().myReport().list().execute();
+                reports = Api.getClient().report().listMyReport().execute();
             } catch (IOException e) {
                 Log.d(TAG, "InitializeObjects: " + e.getLocalizedMessage());
             }
@@ -111,15 +111,15 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseMyReport collectionResponseMyReport) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            super.onPostExecute(collectionResponseMyReport);
-            ArrayList<MyReport> myReports = new ArrayList<>();
-            if(collectionResponseMyReport != null) {
-                if(collectionResponseMyReport.getItems() != null) {
-                    myReports.addAll(collectionResponseMyReport.getItems());
+            super.onPostExecute(collectionResponseReport);
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = collectionResponseMyReport.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
@@ -127,11 +127,11 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
             progressBar.setVisibility(View.GONE);
             swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
-            adapter.addObjects(myReports);
+            adapter.addObjects(reports);
         }
     }
 
-    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseMyReport> {
+    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseReport> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -139,11 +139,11 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         }
 
         @Override
-        protected CollectionResponseMyReport doInBackground(String... params) {
+        protected CollectionResponseReport doInBackground(String... params) {
             String cur = params[0];
-            CollectionResponseMyReport reports = null;
+            CollectionResponseReport reports = null;
             try {
-                reports = Api.getClient().myReport().list().setCursor(cur).execute();
+                reports = Api.getClient().report().listMyReport().setCursor(cur).execute();
             } catch (Exception e) {
                 Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
             }
@@ -151,21 +151,21 @@ public class MyPostFragment extends Fragment implements SwipyRefreshLayout.OnRef
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseMyReport collectionResponseMyReport) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            ArrayList<MyReport> myReports = new ArrayList<>();
-            if(collectionResponseMyReport != null) {
-                if(collectionResponseMyReport.getItems() != null) {
-                    myReports.addAll(collectionResponseMyReport.getItems());
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = collectionResponseMyReport.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
             swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             //set data for list
-            adapter.addObjects(myReports);
+            adapter.addObjects(reports);
 
         }
 

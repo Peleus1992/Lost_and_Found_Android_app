@@ -2,7 +2,6 @@ package edu.gatech.wguo64.lostandfoundandroidapp.adapter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +12,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailFoundActivity;
-import edu.gatech.wguo64.lostandfoundandroidapp.activity.DetailLostActivity;
 import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Comment;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Comment;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.utility.ImageDownloader;
-import edu.gatech.wguo64.lostandfoundandroidapp.utility.TextTrimmer;
 
 /**
  * Created by guoweidong on 10/24/15.

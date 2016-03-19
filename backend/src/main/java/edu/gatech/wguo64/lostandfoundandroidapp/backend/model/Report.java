@@ -1,11 +1,12 @@
 package edu.gatech.wguo64.lostandfoundandroidapp.backend.model;
 
+import com.google.appengine.api.datastore.GeoPt;
+import com.google.appengine.api.search.Field;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
-import com.googlecode.objectify.annotation.Load;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,13 +17,15 @@ import java.util.List;
  */
 
 @Entity
-public abstract class Report {
+public class Report {
 
     //TODO consider changing id type to string
     @Id
     Long id;
     String title;
     String description;
+
+    List<String> tags;
     @Index
     Date created;
     @Index
@@ -30,13 +33,91 @@ public abstract class Report {
     @Index
     String userEmail;
     String photoUrl;
+    @Index
+    boolean reportType;
+    @Index
+    Date time;
+    GeoPt location;
+    String imageUrl;
+    String imageKey;
+    boolean status;
 
     List<Ref<Comment>> comments;
 
     public Report() {
         created = new Date();
         comments = new ArrayList<>();
+        status = false;
     }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public String getTagsString() {
+        if(tags == null) {
+            return "";
+        }
+        StringBuilder sbTags = new StringBuilder();
+        for(String t : tags) {
+            sbTags.append(t + " ");
+        }
+        return sbTags.toString();
+    }
+
+    public boolean getReportType() {
+        return reportType;
+    }
+
+    public void setReportType(boolean reportType) {
+        this.reportType = reportType;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public GeoPt getLocation() {
+        return location;
+    }
+
+    public void setLocation(GeoPt location) {
+        this.location = location;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageKey() {
+        return imageKey;
+    }
+
+    public void setImageKey(String imageKey) {
+        this.imageKey = imageKey;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+
 
     public Long getId() {
         return id;

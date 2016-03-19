@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import edu.gatech.wguo64.lostandfoundandroidapp.R;
-import edu.gatech.wguo64.lostandfoundandroidapp.adapter.FoundRecyclerViewAdapter;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseFoundReport;
-import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.FoundReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.adapter.ReportRecyclerViewAdapter;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.CollectionResponseReport;
+import edu.gatech.wguo64.lostandfoundandroidapp.backend.myApi.model.Report;
 import edu.gatech.wguo64.lostandfoundandroidapp.network.Api;
 
 
@@ -32,7 +32,7 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
     public RecyclerView recyclerView;
     public ProgressBar progressBar;
 
-    private FoundRecyclerViewAdapter adapter;
+    private ReportRecyclerViewAdapter adapter;
 
     private String cursor;
 
@@ -75,8 +75,8 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         swipyRefreshLayout.setOnRefreshListener(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new FoundRecyclerViewAdapter(new
-                ArrayList<FoundReport>(), getContext());
+        adapter = new ReportRecyclerViewAdapter(new
+                ArrayList<Report>(), getContext());
         recyclerView.setAdapter(adapter);
     }
 
@@ -88,7 +88,7 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         new AppendObjectsTask().execute(cursor);
     }
 
-    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseFoundReport> {
+    private class InitializeObjectsTask extends AsyncTask<Void, Void, CollectionResponseReport> {
 
         @Override
         protected void onPreExecute() {
@@ -100,10 +100,10 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         }
 
         @Override
-        protected CollectionResponseFoundReport doInBackground(Void... params) {
-            CollectionResponseFoundReport reports = null;
+        protected CollectionResponseReport doInBackground(Void... params) {
+            CollectionResponseReport reports = null;
             try {
-                reports = Api.getClient().foundReport().list().execute();
+                reports = Api.getClient().report().listFoundReport().execute();
             } catch (IOException e) {
                 Log.d(TAG, "InitializeObjects: " + e.getLocalizedMessage());
             }
@@ -111,15 +111,15 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseFoundReport reports) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            super.onPostExecute(reports);
-            ArrayList<FoundReport> foundReports = new ArrayList<>();
-            if(reports != null) {
-                if(reports.getItems() != null) {
-                    foundReports.addAll(reports.getItems());
+            super.onPostExecute(collectionResponseReport);
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = reports.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
                 Log.i(TAG, "InitializeObjects: Cursor :" + cursor);
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
@@ -128,11 +128,11 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
             progressBar.setVisibility(View.GONE);
             swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
-            adapter.addObjects(foundReports);
+            adapter.addObjects(reports);
         }
     }
 
-    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseFoundReport> {
+    private class AppendObjectsTask extends AsyncTask<String, Void, CollectionResponseReport> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -140,11 +140,11 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         }
 
         @Override
-        protected CollectionResponseFoundReport doInBackground(String... params) {
+        protected CollectionResponseReport doInBackground(String... params) {
             String cur = params[0];
-            CollectionResponseFoundReport reports = null;
+            CollectionResponseReport reports = null;
             try {
-                reports = Api.getClient().foundReport().list().setCursor(cur).execute();
+                reports = Api.getClient().report().listFoundReport().setCursor(cur).execute();
             } catch (Exception e) {
                 Log.d(TAG, "AppendObjectsTask: " + e.getLocalizedMessage());
             }
@@ -152,21 +152,21 @@ public class FoundFragment extends Fragment implements SwipyRefreshLayout.OnRefr
         }
 
         @Override
-        protected void onPostExecute(CollectionResponseFoundReport reports) {
+        protected void onPostExecute(CollectionResponseReport collectionResponseReport) {
             //handle visibility
-            ArrayList<FoundReport> foundReports = new ArrayList<>();
-            if(reports != null) {
-                if(reports.getItems() != null) {
-                    foundReports.addAll(reports.getItems());
+            ArrayList<Report> reports = new ArrayList<>();
+            if(collectionResponseReport != null) {
+                if(collectionResponseReport.getItems() != null) {
+                    reports.addAll(collectionResponseReport.getItems());
                 }
-                cursor = reports.getNextPageToken();
+                cursor = collectionResponseReport.getNextPageToken();
             } else {
                 Snackbar.make(rootView, R.string.failure_update, Snackbar.LENGTH_SHORT).show();
             }
             swipyRefreshLayout.setEnabled(true);
             swipyRefreshLayout.setRefreshing(false);
             //set data for list
-            adapter.addObjects(foundReports);
+            adapter.addObjects(reports);
 
         }
 
