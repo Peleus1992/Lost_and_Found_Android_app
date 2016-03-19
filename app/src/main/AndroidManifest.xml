@@ -29,7 +29,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -38,15 +38,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.ReportLostActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name=".activity.ReportActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.PinDropActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -60,18 +52,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.DetailLostActivity"
-            android:label="@string/title_activity_detail_lost"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
             android:name=".activity.DetailReportActivity"
             android:label="@string/title_activity_detail_found"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.SelectSearchActivity"
-            android:label="@string/title_activity_select_search"
             android:screenOrientation="portrait" >
         </activity>
         <activity
