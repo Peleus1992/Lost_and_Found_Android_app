@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +87,7 @@ public class ReportRecyclerViewAdapter extends RecyclerView.Adapter<ReportRecycl
         viewHolder.descriptionTxt.setTag(report.getId());
         //Object image
         if(report.getImageUrl() != null) {
+            Log.d(TAG, report.getImageUrl());
             new ImageDownloader(viewHolder.objectImage).execute(report.getImageUrl());
         }
         viewHolder.objectImage.setOnClickListener(this);

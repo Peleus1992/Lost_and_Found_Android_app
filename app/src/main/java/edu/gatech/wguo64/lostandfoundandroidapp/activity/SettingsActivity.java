@@ -90,7 +90,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Settings");
-
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingsActivity.this.onBackPressed();
+            }
+        });
         /**
          * Initiate user info.
          */
