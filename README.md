@@ -5,21 +5,53 @@ This is originally a project for class CS6235 which I worked with Katri Mohamed.
 
 Although we have implemented many functionalities and the code can run successfully, many redundant code exists and there's no proper comments. Besides, many warning exists and the code is not fully tested, so I believe there are many bugs to be explored. Moreover, there are many other interesting functions to be implemented. As a result, I plan to continue working on this project during next semester.
 
-## Screenshot
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_1.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_2.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_3.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_4.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_5.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_6.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_7.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_8.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_9.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_10.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_11.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_12.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_13.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_14.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_15.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_16.png" height="420" width="240"/>
-<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_17.png" height="420" width="240"/>
+## Function
+### Report lost and found
+Users can report lost and found by clicking on the floating action button. They need to select report type (lost/found). Then they need type in title and description to describe the object. They can type in keywords to help us match lost and found report. They can also take a picture of the object. After that, users can select a time when they found or lost the object. They can also pin point a location on Google Map or search location by text. After that they only need to click on Done button to submit.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_report1.png" height="420" width="240"/>
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_report2.png" height="420" width="240"/>
+
+
+###  Lost report list
+This page shows a list of lost reports. User can scroll down refresh and scroll up to see more reports. User can comment on the report, share on Google+ and Contact the publisher by emailing. Clicking on the report can see detailed information.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_lost.png" height="420" width="240"/>
+
+###  Found report list
+This page shows a list of found reports. User can scroll down refresh and scroll up to see more reports. User can comment on the report, share on Google+ and Contact the publisher by emailing. Clicking on the report can see detailed information.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_lost.png" height="420" width="240"/>
+
+### My report list
+This page shows a list of my reports. User can scroll down refresh and scroll up to see more reports. Users can delete the report. They can also mark their lost report as found or mark their found report as returned. Clicking on the report can see detailed information.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_mypost.png" height="420" width="240"/>
+
+### Comment on report
+By clicking on Comment button, user can see others comment on the report and can comment on the report.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_comment.png" height="420" width="240"/>
+
+### Contact the publisher
+By clicking on the Contact button, user can contact the publisher by emailing.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_contact.png" height="420" width="240"/>
+
+### Share on Google+
+By clicking on the Share button, user can share the report on Google+.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_share.png" height="420" width="240"/>
+
+### Search reports
+User can search reports by clicking on the search icon.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_search.png" height="420" width="240"/>
+
+### Menu Page
+By swipe right, user can see the menu page.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_menu.png" height="420" width="240"/>
+
+### Setting Page.
+This page displays user's account information and allow user to log out.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_settings.png" height="420" width="240"/>
+
+### Feedback
+By clicking on the feedback button, user can give us feedback.
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_feedback.png" height="420" width="240"/>
+
+### Match reports
+User can specify one or more keywords and location to help us match lost report and found report. Basically, for example. User A lost a Nexus 6p, he specify a keyword "Nexus 6p" and the location. When user B found a Nexus, he also sepcify keywords "Phone", "Nexus 6p" and location. So when the keywords set of lost report and found report share one or more keywords and the distance between lost report and found report is within  50 meter, the backend will find a match and send notification to user. 
+<img src="https://github.com/Peleus1992/Lost_and_Found_Android_app/blob/master/screenshot/Screenshot_match.png" height="420" width="240"/>
