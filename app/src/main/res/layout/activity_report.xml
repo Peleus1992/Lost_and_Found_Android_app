@@ -190,7 +190,7 @@
                             android:id="@+id/timeCheck"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="I really don't remember when I found it."/>
+                            android:text="I really don't remember."/>
 
                         <android.support.design.widget.TextInputLayout
                             android:layout_width="match_parent"
@@ -240,7 +240,7 @@
                             android:id="@+id/positionCheck"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="I really don't remember where I found it."/>
+                            android:text="I really don't remember."/>
 
                         <fragment
                             android:id="@+id/map"
